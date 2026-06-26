@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react'
 import Image from 'next/image'
-import { useRouter, usePathname } from 'next/navigation'
 import {
   Wallet,
   ShoppingCart,
@@ -49,50 +48,84 @@ interface DashboardContainerProps {
 }
 
 export default function DashboardContainer({ initialTab = 'dashboard' }: DashboardContainerProps) {
-  const router = useRouter()
-  const pathname = usePathname()
 
   // Active Tab State
   const [activeTab, setActiveTab] = useState<DashboardTab>(initialTab)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
-  // Sync active tab with pathname changes
-  useEffect(() => {
-    if (pathname === '/' || pathname === '/contact-us/profile') {
-      setActiveTab('dashboard')
-    } else if (pathname === '/contact-us/settings') {
-      setActiveTab('profile')
-    } else if (pathname === '/contact-us/renewal') {
-      setActiveTab('renewals')
-    } else if (pathname === '/microsoft-customers') {
-      setActiveTab('customers')
-    } else if (pathname === '/payment/order-list') {
-      setActiveTab('orders')
-    } else if (pathname === '/products/showcase') {
-      setActiveTab('vendors') // Mapping vendors to products showcase
-    }
-  }, [pathname])
+  // Tab-to-URL mapping for silent URL updates
+  const tabToPath: Record<DashboardTab, string> = {
+    dashboard: '/contact-us/profile',
+    profile: '/contact-us/settings',
+    renewals: '/contact-us/renewal',
+    customers: '/microsoft-customers',
+    orders: '/payment/order-list',
+    vendors: '/products/showcase',
+    contact: '/',
+    erp: '/',
+  }
 
-  // Navigation action
+  // Navigation action — update tab state and silently update the URL
+  // without triggering a Next.js route change (which would remount the component)
   const handleNav = (tab: DashboardTab) => {
     setActiveTab(tab)
     setMobileMenuOpen(false)
-    if (tab === 'dashboard') {
-      router.push('/contact-us/profile')
-    } else if (tab === 'profile') {
-      router.push('/contact-us/settings')
-    } else if (tab === 'renewals') {
-      router.push('/contact-us/renewal')
-    } else if (tab === 'customers') {
-      router.push('/microsoft-customers')
-    } else if (tab === 'orders') {
-      router.push('/payment/order-list')
-    } else if (tab === 'vendors') {
-      router.push('/products/showcase')
+    const targetPath = tabToPath[tab]
+    if (targetPath) {
+      window.history.replaceState(null, '', targetPath)
     }
   }
 
   // --- MOCK DATABASE STATE ---
+  // Selected Year for Yearly Orders Chart
+  const [selectedYear, setSelectedYear] = useState('2026')
+
+  // Yearly Orders Data
+  const yearlyOrdersData: Record<string, { month: string; count: number }[]> = {
+    '2026': [
+      { month: 'Jan', count: 23 },
+      { month: 'Feb', count: 11 },
+      { month: 'Mar', count: 8 },
+      { month: 'Apr', count: 9 },
+      { month: 'May', count: 1 },
+      { month: 'Jun', count: 7 },
+      { month: 'Jul', count: 0 },
+      { month: 'Aug', count: 0 },
+      { month: 'Sep', count: 0 },
+      { month: 'Oct', count: 0 },
+      { month: 'Nov', count: 0 },
+      { month: 'Dec', count: 0 },
+    ],
+    '2025': [
+      { month: 'Jan', count: 18 },
+      { month: 'Feb', count: 15 },
+      { month: 'Mar', count: 22 },
+      { month: 'Apr', count: 14 },
+      { month: 'May', count: 19 },
+      { month: 'Jun', count: 21 },
+      { month: 'Jul', count: 17 },
+      { month: 'Aug', count: 20 },
+      { month: 'Sep', count: 16 },
+      { month: 'Oct', count: 24 },
+      { month: 'Nov', count: 12 },
+      { month: 'Dec', count: 25 },
+    ],
+    '2024': [
+      { month: 'Jan', count: 12 },
+      { month: 'Feb', count: 14 },
+      { month: 'Mar', count: 10 },
+      { month: 'Apr', count: 15 },
+      { month: 'May', count: 8 },
+      { month: 'Jun', count: 13 },
+      { month: 'Jul', count: 11 },
+      { month: 'Aug', count: 9 },
+      { month: 'Sep', count: 14 },
+      { month: 'Oct', count: 16 },
+      { month: 'Nov', count: 18 },
+      { month: 'Dec', count: 20 },
+    ]
+  }
+
   // Wallet
   const [wallet, setWallet] = useState({
     AED: 46.75,
@@ -157,11 +190,50 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
 
   // Notifications State
   const [notifications, setNotifications] = useState([
-    { id: 1, text: 'Invoice generated for order_44_943145...', time: '2 hours ago', unread: true },
-    { id: 2, text: 'Microsoft subscription updated for union...', time: '5 hours ago', unread: true },
-    { id: 3, text: 'Wallet balance low notification (USD)', time: '1 day ago', unread: false },
-    { id: 4, text: 'Zoho license renewal notice for al-ain...', time: '2 days ago', unread: false }
+    {
+      id: 1,
+      title: 'Microsoft 365 Subscription',
+      text: '1 licenses of Microsoft 365 Business Basic product were subscribed for unionscaffoldingcom.onmicrosoft.com',
+      time: 'Just now',
+      unread: true,
+      type: 'microsoft'
+    },
+    {
+      id: 2,
+      title: 'Microsoft 365 Subscription',
+      text: '1 licenses of Microsoft 365 Business Basic product were subscribed for babtents.onmicrosoft.com',
+      time: '2 hours ago',
+      unread: true,
+      type: 'microsoft'
+    },
+    {
+      id: 3,
+      title: 'Exchange Online Archiving',
+      text: '1 licenses of Exchange Online Archiving for Exchange Online product were subscribed for zabshipping.onmicrosoft.com',
+      time: '5 hours ago',
+      unread: true,
+      type: 'exchange'
+    },
+    {
+      id: 4,
+      title: 'Microsoft 365 & Copilot',
+      text: '1 licenses of Microsoft 365 Business Standard and Microsoft 365 Copilot Business product were subscribed for kalliyath.onmicrosoft.com',
+      time: '1 day ago',
+      unread: false,
+      type: 'microsoft'
+    },
+    {
+      id: 5,
+      title: 'Microsoft 365 Subscription',
+      text: '1 licenses of Microsoft 365 Business Basic product were subscribed for grandlotusae.onmicrosoft.com',
+      time: '2 days ago',
+      unread: false,
+      type: 'microsoft'
+    }
   ])
+
+  const [activeNotificationFilter, setActiveNotificationFilter] = useState<'All' | 'Unread'>('All')
+
 
   // --- FILTERS STATE ---
   // Order list filters
@@ -361,8 +433,8 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#f4f7fa] text-slate-800 font-sans flex flex-col antialiased">
-      
+    <div className="h-screen w-full bg-[#f4f7fa] text-slate-800 font-sans flex flex-col antialiased overflow-hidden">
+
       {/* Toast Alert */}
       {toastMessage && (
         <div className="fixed bottom-5 right-5 z-[9999] bg-slate-900/90 backdrop-blur-md border border-[#f41b5d]/30 text-white py-3.5 px-5 rounded-xl shadow-2xl flex items-center gap-3 animate-fadeIn">
@@ -375,14 +447,20 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
       )}
 
       {/* Main card container */}
-      <div className="flex-1 bg-[#f4f7fa] flex flex-col overflow-hidden w-full min-h-screen relative">
-        
+      <div className="flex-1 bg-[#f4f7fa] flex flex-col overflow-hidden w-full relative">
+
         {/* Header */}
         <header className="border-b border-slate-200/40 bg-white/70 backdrop-blur-md py-4 px-6 sm:px-8 flex justify-between items-center z-50">
           {/* Logo */}
-          <div className="flex flex-col select-none cursor-pointer text-left animate-fadeIn" onClick={() => handleNav('dashboard')}>
-            <span className="text-xl font-black tracking-tight text-slate-900">saasorder</span>
-            <span className="text-[9px] uppercase tracking-widest font-extrabold text-slate-400 -mt-1 pl-0.5">studio.</span>
+          <div className="select-none cursor-pointer text-left animate-fadeIn flex items-center" onClick={() => handleNav('dashboard')}>
+            <Image
+              src="/logo_03.png"
+              alt="SaaS Order Logo"
+              width={120}
+              height={40}
+              className="h-10 w-auto object-contain"
+              priority
+            />
           </div>
 
           {/* Date range filter capsules */}
@@ -443,10 +521,10 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
         </header>
 
         {/* Content Area with desktop sidebar and tab content */}
-        <div className="flex-1 flex flex-col lg:flex-row p-6 sm:p-8 gap-8 overflow-y-auto min-h-0">
-          
+        <div className="flex-1 flex flex-col lg:flex-row px-6 sm:px-8 py-0 gap-8 overflow-y-auto lg:overflow-hidden min-h-0">
+
           {/* Sidebar */}
-          <aside className="hidden lg:flex flex-col items-center bg-white border border-slate-200/50 rounded-[24px] py-6 px-3 shadow-sm gap-5 self-start sticky top-0 z-10">
+          <aside className="hidden lg:flex flex-col items-center bg-white border border-slate-200/50 rounded-[24px] py-6 px-3 shadow-sm gap-5 self-start sticky top-6 sm:top-8 my-6 sm:my-8 z-10">
             {[
               { id: 'dashboard', icon: BarChart3, label: 'Dashboard' },
               { id: 'vendors', icon: ShoppingCart, label: 'Catalog' },
@@ -461,14 +539,13 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
                 <button
                   key={item.id}
                   onClick={() => handleNav(item.id as DashboardTab)}
-                  className={`w-11 h-11 rounded-full flex items-center justify-center transition-all relative group cursor-pointer ${
-                    isActive 
-                      ? 'bg-slate-900 text-white shadow-md scale-105' 
-                      : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'
-                  }`}
+                  className={`w-11 h-11 rounded-full flex items-center justify-center transition-all relative group cursor-pointer ${isActive
+                    ? 'bg-slate-900 text-white shadow-md scale-105'
+                    : 'text-slate-400 hover:text-slate-900 hover:bg-slate-100'
+                    }`}
                 >
                   <Icon className="w-5 h-5" />
-                  
+
                   {/* Tooltip on hover */}
                   <span className="absolute left-16 bg-slate-900 text-white text-[10px] font-bold py-1.5 px-3 rounded-md shadow-md opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap z-50">
                     {item.label}
@@ -479,8 +556,8 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
           </aside>
 
           {/* Right panel (dynamic depending on tab) */}
-          <div className="flex-1 min-w-0 flex flex-col gap-6">
-            
+          <div className="flex-1 min-w-0 flex flex-col gap-6 lg:overflow-y-auto lg:h-full py-6 sm:py-8 lg:pr-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+
             {/* Tab 1: Dashboard */}
             {activeTab === 'dashboard' && (
               <div className="flex-1 min-w-0 flex flex-col gap-6 animate-fadeIn">
@@ -504,143 +581,21 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
 
                 {/* Grid layout in 3 columns: My Tasks (3/12), Middle Analytics (6/12), Right Panels (3/12) */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                  
-                  {/* COLUMN 1: My Tasks (col-span-3) */}
-                  <div className="lg:col-span-3 bg-white border border-slate-200/50 rounded-[24px] p-5 shadow-sm flex flex-col gap-4">
-                    {/* My Tasks Header */}
-                    <div className="flex justify-between items-center">
-                      <h2 className="text-xs font-black text-slate-500 uppercase tracking-wider">My Tasks</h2>
-                      <button onClick={() => triggerToast('Creating a new task...')} className="w-6 h-6 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">
-                        <Plus className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
 
-                    {/* Subtabs */}
-                    <div className="flex bg-slate-100 p-0.5 rounded-full text-[10px] font-bold text-slate-500 shadow-inner">
-                      {['Today', 'Tomorrow'].map((t) => (
-                        <button
-                          key={t}
-                          onClick={() => triggerToast(`Showing tasks for ${t.toLowerCase()}...`)}
-                          className={`flex-1 py-1.5 rounded-full transition-all cursor-pointer ${t === 'Today' ? 'bg-slate-900 text-white shadow-sm' : 'hover:text-slate-900'}`}
-                        >
-                          {t}
-                        </button>
-                      ))}
-                    </div>
+                  {/* COLUMN 2 & 3: Main dashboard area (col-span-9) */}
+                  <div className="lg:col-span-9 flex flex-col gap-6">
 
-                    {/* Dropdown status selection */}
-                    <button className="flex items-center justify-between border border-slate-200 rounded-full px-3.5 py-1.5 text-[10px] font-bold text-slate-500 hover:bg-slate-50 transition-colors w-full">
-                      <div className="flex items-center gap-1.5">
-                        <span className="w-4 h-4 rounded-full bg-slate-900 text-white flex items-center justify-center text-[8px] font-black">{notifications.length}</span>
-                        <span>On Going Tasks</span>
-                      </div>
-                      <ChevronDown className="w-3 h-3 text-slate-400" />
-                    </button>
+                    {/* TOP ROW: Wallet, Orders, Customer Management */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-                    {/* Tasks List */}
-                    <div className="flex flex-col gap-3 max-h-[360px] overflow-y-auto pr-1 no-scrollbar">
-                      {notifications.map((n, idx) => {
-                        // Map colors and icons in a gorgeous minimal style
-                        const colors = [
-                          { bg: 'bg-orange-50/40 border-orange-100/60', text: 'text-orange-850', logoBg: 'bg-orange-100/60 text-orange-600', icon: '🦊' },
-                          { bg: 'bg-slate-50/65 border-slate-200/40', text: 'text-slate-850', logoBg: 'bg-slate-100 text-slate-600', icon: '🐙' },
-                          { bg: 'bg-pink-50/40 border-pink-100/60', text: 'text-pink-850', logoBg: 'bg-pink-100/60 text-pink-600', icon: '9' },
-                          { bg: 'bg-emerald-50/40 border-emerald-100/60', text: 'text-emerald-850', logoBg: 'bg-emerald-100/60 text-emerald-600', icon: 'U' }
-                        ]
-                        const c = colors[idx % colors.length]
-                        return (
-                          <div key={n.id} className={`border rounded-2xl p-3.5 flex flex-col gap-3 text-left transition-all ${c.bg} relative group`}>
-                            {/* Top Header of Card */}
-                            <div className="flex justify-between items-center">
-                              <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs shadow-sm ${c.logoBg}`}>
-                                {c.icon}
-                              </div>
-                              <button 
-                                onClick={() => triggerToast(`Task completed!`)}
-                                className="w-5 h-5 rounded-full border border-slate-300 flex items-center justify-center text-slate-300 hover:text-emerald-500 hover:border-emerald-500 transition-colors bg-white shadow-sm cursor-pointer"
-                              >
-                                <Check className="w-3 h-3 stroke-[3]" />
-                              </button>
-                            </div>
-
-                            {/* Content */}
-                            <div className="space-y-1">
-                              <h4 className="text-xs font-black text-slate-855 leading-tight">{n.text.split(' ')[0]} - Update</h4>
-                              <p className="text-[10px] text-slate-500 leading-normal font-semibold line-clamp-2">{n.text}</p>
-                            </div>
-
-                            {/* Footer */}
-                            <div className="flex items-center gap-1 text-[8px] font-bold text-slate-400">
-                              <Clock className="w-2.5 h-2.5" />
-                              <span>{n.time}</span>
-                            </div>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-
-                  {/* COLUMN 2: Middle Analytics (col-span-6) */}
-                  <div className="lg:col-span-6 flex flex-col gap-6">
-                    {/* Top Grid: Projects Overview & Income VS Expense */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      
-                      {/* Projects Overview */}
-                      <div className="bg-white border border-slate-200/50 rounded-[24px] p-5 shadow-sm flex flex-col justify-between">
-                        <div className="flex justify-between items-center mb-2">
-                          <h2 className="text-xs font-black text-slate-500 uppercase tracking-wider">Projects Overview</h2>
-                          <button onClick={() => triggerToast('Opening project logs...')} className="w-6 h-6 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-800 cursor-pointer">
-                            <ArrowUpRight className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-
-                        {/* Custom SVG Donut Chart */}
-                        <div className="flex justify-center items-center py-4 relative">
-                          <svg className="w-32 h-32 transform -rotate-90">
-                            {/* Base circle - Others (purple) */}
-                            <circle cx="64" cy="64" r="48" fill="transparent" stroke="#f1f5f9" strokeWidth="12" />
-                            {/* Others: 9/897 = ~1.0% */}
-                            <circle cx="64" cy="64" r="48" fill="transparent" stroke="#8b5cf6" strokeWidth="12" strokeDasharray="301.6" strokeDashoffset="0" />
-                            {/* Google: 95/897 = ~10.6% (stroke-dashoffset: 301.6 * (1 - 0.106) = 269.6) */}
-                            <circle cx="64" cy="64" r="48" fill="transparent" stroke="#ff7f32" strokeWidth="12" strokeDasharray="301.6" strokeDashoffset="269.6" />
-                            {/* Microsoft: 793/897 = ~88.4% (stroke-dashoffset: 301.6 * (1 - 0.884 - 0.106) = 301.6 * 0.01 = 3.0) */}
-                            <circle cx="64" cy="64" r="48" fill="transparent" stroke="#1b88e6" strokeWidth="12" strokeDasharray="301.6" strokeDashoffset="33.0" />
-                          </svg>
-                          {/* Center total count */}
-                          <div className="absolute inset-0 flex flex-col items-center justify-center leading-none">
-                            <span className="text-[9px] font-bold text-slate-400 tracking-wider">TOTAL</span>
-                            <span className="text-2xl font-black text-slate-800 mt-1">897</span>
-                          </div>
-                        </div>
-
-                        {/* Legend in style of reference image */}
-                        <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-slate-100 text-xs font-bold text-slate-500">
-                          <div className="flex justify-center gap-6">
-                            <div className="flex items-center gap-1.5">
-                              <span className="w-2.5 h-2.5 rounded-full bg-[#ff7f32]" />
-                              <span>Google: <span className="text-slate-800 font-extrabold">95</span></span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <span className="w-2.5 h-2.5 rounded-full bg-[#1b88e6]" />
-                              <span>Microsoft: <span className="text-slate-800 font-extrabold">793</span></span>
-                            </div>
-                          </div>
-                          <div className="flex justify-center items-center gap-1.5">
-                            <span className="w-2.5 h-2.5 rounded-full bg-[#8b5cf6]" />
-                            <span>Others: <span className="text-slate-800 font-extrabold">9</span></span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Income VS Expense */}
                       {/* Wallet Card */}
-                      <div className="bg-white border border-slate-200/50 rounded-[24px] p-5 shadow-sm flex flex-col justify-between min-h-[300px]">
+                      <div className="bg-white border border-slate-200/50 rounded-[24px] p-5 shadow-sm flex flex-col justify-between h-[360px]">
                         <div className="flex justify-between items-center mb-4">
                           <div className="flex items-center gap-2">
                             <Wallet className="w-4.5 h-4.5 text-slate-500" />
                             <h2 className="text-xs font-black text-slate-500 uppercase tracking-wider">Wallet</h2>
                           </div>
-                          <button 
+                          <button
                             onClick={() => setTopUpHistoryModalOpen(true)}
                             className="text-[10px] font-bold text-slate-400 hover:text-slate-700 transition-colors flex items-center gap-1 cursor-pointer"
                           >
@@ -656,8 +611,8 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
                             { code: 'INR', symbol: '₹', amount: wallet.INR, color: 'bg-violet-50 text-violet-600 border-violet-100', text: 'Indian Rupee' },
                             { code: 'USD', symbol: '$', amount: wallet.USD, color: 'bg-emerald-50 text-emerald-600 border-emerald-100', text: 'US Dollar' },
                           ].map((item) => (
-                            <div 
-                              key={item.code} 
+                            <div
+                              key={item.code}
                               className="flex items-center justify-between p-3.5 bg-slate-50/50 border border-slate-100 hover:bg-slate-50 hover:border-slate-200/60 rounded-2xl transition-all duration-200"
                             >
                               <div className="flex items-center gap-3">
@@ -680,167 +635,604 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
                         </div>
 
                         {/* Actions */}
-                        <div className="grid grid-cols-2 gap-3 mt-4 pt-3 border-t border-slate-100">
-                          <button 
+                        <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-100">
+                          <button
                             onClick={() => setTopUpModalOpen(true)}
-                            className="bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-3 rounded-xl transition-all text-xs flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow"
+                            className="bg-slate-900 hover:bg-slate-800 text-white font-bold h-10 px-2 rounded-xl transition-all text-[11px] whitespace-nowrap flex items-center justify-center gap-1.5 cursor-pointer shadow-sm hover:shadow"
                           >
-                            <Plus className="w-3.5 h-3.5" />
+                            <Plus className="w-3.5 h-3.5 shrink-0" />
                             <span>Top Up</span>
                           </button>
-                          <button 
+                          <button
                             onClick={() => setTopUpHistoryModalOpen(true)}
-                            className="border border-slate-200 hover:border-slate-300 bg-white text-slate-700 font-bold py-2 px-3 rounded-xl transition-all text-xs flex items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-50"
+                            className="border border-slate-200 hover:border-slate-300 bg-white text-slate-700 font-bold h-10 px-2 rounded-xl transition-all text-[11px] whitespace-nowrap flex items-center justify-center gap-1.5 cursor-pointer hover:bg-slate-50"
                           >
-                            <FileText className="w-3.5 h-3.5 text-slate-400" />
+                            <FileText className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                             <span>Top Up List</span>
                           </button>
                         </div>
                       </div>
+
+                      {/* Orders Overview */}
+                      <div className="bg-white border border-slate-200/50 rounded-[24px] p-5 shadow-sm flex flex-col justify-between h-[360px]">
+                        <div className="flex justify-between items-center mb-2">
+                          <h2 className="text-xs font-black text-slate-500 uppercase tracking-wider">ORDERS</h2>
+                          <button
+                            onClick={() => handleNav('orders')}
+                            className="text-[10px] font-black text-slate-400 hover:text-slate-805 flex items-center gap-1 cursor-pointer border border-slate-200/60 rounded-full px-2.5 py-1 hover:border-slate-300 transition-all uppercase tracking-wider bg-slate-50/50 hover:bg-slate-50"
+                          >
+                            <span>All Orders</span>
+                            <ArrowUpRight className="w-3 h-3 text-slate-400" />
+                          </button>
+                        </div>
+
+                        {/* Custom SVG Donut Chart */}
+                        <div className="flex justify-center items-center py-2 relative">
+                          <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 160 160">
+                            {/* Base circle - background track */}
+                            <circle cx="80" cy="80" r="60" fill="transparent" stroke="#f1f5f9" strokeWidth="14" />
+                            {/* Microsoft: 793/897 = ~88.4% */}
+                            <circle cx="80" cy="80" r="60" fill="transparent" stroke="#1b88e6" strokeWidth="14" strokeDasharray="333.3 377" strokeDashoffset="0" />
+                            {/* Google: 95/897 = ~10.6% */}
+                            <circle cx="80" cy="80" r="60" fill="transparent" stroke="#ff7f32" strokeWidth="14" strokeDasharray="39.9 377" strokeDashoffset="-333.3" />
+                            {/* Others: 9/897 = ~1.0% */}
+                            <circle cx="80" cy="80" r="60" fill="transparent" stroke="#8b5cf6" strokeWidth="14" strokeDasharray="3.8 377" strokeDashoffset="-373.2" />
+                          </svg>
+                          {/* Center total count */}
+                          <div className="absolute inset-0 flex flex-col items-center justify-center leading-none">
+                            <span className="text-[10px] font-bold text-slate-400 tracking-wider">ORDERS</span>
+                            <span className="text-3xl font-black text-slate-805 mt-1.5">897</span>
+                          </div>
+                        </div>
+
+                        {/* Legend in style of reference image */}
+                        <div className="flex flex-col gap-2 mt-4 pt-4 border-t border-slate-100 text-xs font-bold text-slate-500">
+                          <div className="flex justify-center gap-6">
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-2.5 h-2.5 rounded-full bg-[#ff7f32]" />
+                              <span>Google: <span className="text-slate-800 font-extrabold">95</span></span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-2.5 h-2.5 rounded-full bg-[#1b88e6]" />
+                              <span>Microsoft: <span className="text-slate-800 font-extrabold">793</span></span>
+                            </div>
+                          </div>
+                          <div className="flex justify-center items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-full bg-[#8b5cf6]" />
+                            <span>Others: <span className="text-slate-800 font-extrabold">9</span></span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Customer Management */}
+                      <div className="bg-white border border-slate-200/50 rounded-[24px] p-5 shadow-sm flex flex-col justify-between h-[360px] text-left">
+                        <div className="flex justify-between items-center mb-1">
+                          <h2 className="text-xs font-black text-slate-500 uppercase tracking-wider">CUSTOMER MANAGEMENT</h2>
+                          <button
+                            onClick={() => handleNav('customers')}
+                            className="text-[10px] font-black text-slate-400 hover:text-slate-808 flex items-center gap-1 cursor-pointer border border-slate-200/60 rounded-full px-2.5 py-1 hover:border-slate-300 transition-all uppercase tracking-wider bg-slate-50/50 hover:bg-slate-50"
+                          >
+                            <span>All Customers</span>
+                            <ArrowUpRight className="w-3 h-3 text-slate-400" />
+                          </button>
+                        </div>
+
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[10px] font-bold text-slate-400 tracking-wider">TOTAL CUSTOMERS</span>
+                          <span className="text-3xl font-black text-slate-808 leading-none">459</span>
+                        </div>
+
+                        {/* Progress/Bar chart breakdown */}
+                        <div className="space-y-4 mt-2">
+                          {[
+                            { label: 'Microsoft (India)', count: 212, pct: '46.2%', color: '#1b88e6' },
+                            { label: 'Microsoft (Global)', count: 157, pct: '34.2%', color: '#8b5cf6' },
+                            { label: 'Google', count: 90, pct: '19.6%', color: '#ff7f32' }
+                          ].map((item) => (
+                            <div key={item.label} className="space-y-1.5">
+                              <div className="flex justify-between text-[11px] font-bold text-slate-700">
+                                <span className="font-extrabold">{item.label}</span>
+                                <span className="text-slate-900 font-black">{item.count}</span>
+                              </div>
+                              <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
+                                <div className="h-full rounded-full transition-all duration-500" style={{ width: item.pct, backgroundColor: item.color }} />
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
                     </div>
 
-                    {/* Invoice Overview */}
+                    {/* PRODUCTS & SERVICES SECTION */}
                     <div className="bg-white border border-slate-200/50 rounded-[24px] p-5 shadow-sm flex flex-col gap-4 text-left">
                       <div className="flex justify-between items-center">
-                        <h2 className="text-xs font-black text-slate-500 uppercase tracking-wider">Invoice Overview</h2>
-                        <button onClick={() => triggerToast('Invoice settings...')} className="w-6 h-6 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-800 cursor-pointer">
-                          <SlidersHorizontal className="w-3.5 h-3.5" />
+                        <div className="space-y-0.5">
+                          <h2 className="text-xs font-black text-slate-500 uppercase tracking-wider">PRODUCTS & SERVICES</h2>
+                          <p className="text-[10px] text-slate-400 font-semibold">Instantly provision and manage subscriptions across top cloud platforms</p>
+                        </div>
+                        <button
+                          onClick={() => handleNav('vendors')}
+                          className="text-[10px] font-black text-[#f41b5d] hover:text-[#d0144d] flex items-center gap-1 cursor-pointer border border-slate-200/60 rounded-full px-3 py-1 hover:border-[#f41b5d]/30 transition-all uppercase tracking-wider bg-slate-50/50 hover:bg-slate-50"
+                        >
+                          <span>Explore Catalog</span>
+                          <ArrowUpRight className="w-3 h-3 text-[#f41b5d]" />
                         </button>
                       </div>
 
-                      {/* Progress bars list */}
-                      <div className="space-y-4">
+                      {/* Vendor Logos Grid */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-4">
                         {[
-                          { label: 'Overdue', color: 'bg-purple-600', fill: 'w-[60%]', count: 5, amount: 18300 },
-                          { label: 'Not Paid', color: 'bg-rose-500', fill: 'w-[50%]', count: 5, amount: 18300 },
-                          { label: 'Partially Paid', color: 'bg-sky-400', fill: 'w-[40%]', count: 5, amount: 18300 },
-                          { label: 'Fully Paid', color: 'bg-emerald-500', fill: 'w-[35%]', count: 5, amount: 18300 },
-                          { label: 'Draft', color: 'bg-amber-400', fill: 'w-[15%]', count: 5, amount: 18300 }
-                        ].map((item) => (
-                          <div key={item.label} className="space-y-1.5">
-                            <div className="flex justify-between text-[10px] font-bold text-slate-700">
-                              <span className="font-extrabold">{item.label}</span>
-                              <span className="text-slate-400 font-semibold">
-                                {item.count} <span className="mx-1 text-slate-300">|</span> USD {item.amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                              </span>
+                          {
+                            name: 'Microsoft',
+                            logo: (
+                              <svg className="w-5 h-5 shrink-0 transition-all duration-300" viewBox="0 0 23 23" fill="none">
+                                <rect x="0" y="0" width="10.5" height="10.5" fill="#f25022" />
+                                <rect x="12.5" y="0" width="10.5" height="10.5" fill="#7fba00" />
+                                <rect x="0" y="12.5" width="10.5" height="10.5" fill="#00a4ef" />
+                                <rect x="12.5" y="12.5" width="10.5" height="10.5" fill="#ffb900" />
+                              </svg>
+                            ),
+                            subText: '793 Licenses',
+                            hoverClasses: 'group-hover/card:border-blue-500/25 group-hover/card:shadow-[0_12px_24px_-6px_rgba(0,120,212,0.12)]'
+                          },
+                          {
+                            name: 'Google',
+                            logo: (
+                              <svg className="w-5 h-5 shrink-0 transition-all duration-300" viewBox="0 0 24 24">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05" />
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335" />
+                              </svg>
+                            ),
+                            subText: '95 Licenses',
+                            hoverClasses: 'group-hover/card:border-red-500/25 group-hover/card:shadow-[0_12px_24px_-6px_rgba(234,67,53,0.12)]'
+                          },
+                          {
+                            name: 'Zoho',
+                            logo: (
+                              <div className="flex gap-0.5 shrink-0 items-center justify-center">
+                                <span className="w-1.5 h-1.5 rounded-sm bg-[#E2231A]" />
+                                <span className="w-1.5 h-1.5 rounded-sm bg-[#00A0E3]" />
+                                <span className="w-1.5 h-1.5 rounded-sm bg-[#8dc63f]" />
+                                <span className="w-1.5 h-1.5 rounded-sm bg-[#ffb900]" />
+                              </div>
+                            ),
+                            subText: '12 Licenses',
+                            hoverClasses: 'group-hover/card:border-purple-500/25 group-hover/card:shadow-[0_12px_24px_-6px_rgba(124,58,237,0.12)]'
+                          },
+                          {
+                            name: 'AWS',
+                            logo: (
+                              <svg className="w-7 h-5 shrink-0 transition-all duration-300" viewBox="0 0 48 28" fill="none">
+                                <path d="M20.2 14.1c0 2.2-1.3 3.6-3.4 3.6-1.5 0-2.6-.9-3-2.1h-.1v1.9h-2.1V7.9h2.2v3.7h.1c.4-1.2 1.5-2.1 3-2.1 2.1 0 3.3 1.4 3.3 4.6zm-2.3.1c0-1.8-.6-2.6-1.7-2.6-1.2 0-1.7.9-1.7 2.6 0 1.7.5 2.6 1.7 2.6 1.1-.1 1.7-.9 1.7-2.6zM28.4 12.2c0-1.2-.8-1.8-2.1-1.8-1.2 0-2.1.5-2.2 1.5h-2.1c.1-2.1 1.8-3.2 4.3-3.2 2.5 0 4.2 1.2 4.2 3.3v5.5c0 1.2.5 1.7.9 1.7.3 0 .6-.1.8-.2v1.7c-.4.2-1 .3-1.6.3-1.2 0-1.8-.7-2-1.8h-.1c-.6 1.1-1.8 2-3.3 2-2.1 0-3.6-1.2-3.6-3.2 0-2.2 1.7-3.1 4.7-3.1h2.1v-.7zm-2.1 2.4h-1.8c-1.5 0-2.2.4-2.2 1.3 0 .8.7 1.3 1.7 1.3 1.3 0 2.3-.9 2.3-2.1v-.5zM38.8 17.5c-.8.8-2 1.5-3.8 1.5-2.7 0-4.4-1.8-4.4-4.7 0-3.1 2-4.8 4.6-4.8 1.7 0 2.8.6 3.5 1.5l-1.4 1.3c-.5-.6-1.2-.9-2-.9-1.4 0-2.4 1-2.4 2.9 0 1.8.9 2.8 2.4 2.8.9 0 1.7-.4 2.2-1l1.3 1.4z" fill="#232F3E" />
+                                <path d="M43.7 14.1c0 2.9-1.8 4.7-4.4 4.7s-4.4-1.8-4.4-4.7c0-3 1.8-4.8 4.4-4.8s4.4 1.8 4.4 4.8zm-6.5 0c0 1.9.9 2.9 2.1 2.9s2.1-1 2.1-2.9c0-1.9-.9-2.9-2.1-2.9s-2.1 1-2.1 2.9z" fill="#232F3E" />
+                                <path d="M4 21c7.2 4.2 16.5 6.5 25.8 6.5 9 0 15.6-2 18.2-4.5.3-.3.1-.7-.3-.6-3.8 1.1-9.5 1.7-16.1 1.7-9.5 0-19.5-2.5-27.1-7.2-.4-.3-.8 0-.5.4z" fill="#FF9900" />
+                                <path d="M44.9 21.6c-.3-.2-.5-.1-.4.2.2.8.4 2 .1 2.8-.1.3.1.5.4.3.8-.6 1.8-2.2 1.9-3.2.1-.3-.2-.3-.4-.2-.8.5-2 .7-3.1.7.3.2 1.1-.3 1.1-.6z" fill="#FF9900" />
+                              </svg>
+                            ),
+                            subText: '4 Active',
+                            hoverClasses: 'group-hover/card:border-amber-500/25 group-hover/card:shadow-[0_12px_24px_-6px_rgba(255,153,0,0.12)]'
+                          },
+                          {
+                            name: 'Red Hat',
+                            logo: (
+                              <svg className="w-5 h-4 shrink-0 transition-all duration-300" viewBox="0 0 30 20" fill="none">
+                                <path d="M15 2C11 2 8 4 6 7.5C5.3 8.7 5.1 9.8 5 11C7 11.5 10 11.8 13.5 11.8C18.5 11.8 22.5 11.2 24.5 10.5C24.4 8 23.5 6 21 4.2C19.5 3.1 17 2 15 2Z" fill="#231F20" />
+                                <path d="M2.5 14C1 14 0 14.8 0 15.5C0 17 6.5 18 15 18C23.5 18 30 17 30 15.5C30 14.8 29 14 27.5 14C23.5 15.5 19.5 16 15 16C10.5 16 6.5 15.5 2.5 14Z" fill="#CC0000" />
+                              </svg>
+                            ),
+                            subText: '6 Licenses',
+                            hoverClasses: 'group-hover/card:border-red-600/25 group-hover/card:shadow-[0_12px_24px_-6px_rgba(227,24,55,0.12)]'
+                          },
+                          {
+                            name: 'Sophos',
+                            logo: (
+                              <div className="text-[10px] font-black tracking-widest text-[#002f6c] dark:text-blue-900 leading-none select-none">SOPHOS</div>
+                            ),
+                            subText: '18 Endpoints',
+                            hoverClasses: 'group-hover/card:border-cyan-500/25 group-hover/card:shadow-[0_12px_24px_-6px_rgba(0,184,230,0.12)]'
+                          },
+                          {
+                            name: 'Acronis',
+                            logo: (
+                              <div className="text-[10px] font-black tracking-tight text-slate-800 leading-none select-none">Acronis</div>
+                            ),
+                            subText: '8 Backups',
+                            hoverClasses: 'group-hover/card:border-sky-500/25 group-hover/card:shadow-[0_12px_24px_-6px_rgba(0,153,255,0.12)]'
+                          }
+                        ].map((vendor) => (
+                          <div
+                            key={vendor.name}
+                            onClick={() => {
+                              setShowcaseGroupFilter(vendor.name)
+                              setAppliedShowcaseFilters({ name: '', group: vendor.name, region: 'All Regions' })
+                              handleNav('vendors')
+                              triggerToast(`Showing showcase products for ${vendor.name}`)
+                            }}
+                            className={`group/card cursor-pointer border border-slate-200/50 bg-slate-50/15 rounded-[20px] p-4 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-1 hover:bg-white hover:border-slate-350/30 hover:shadow-lg ${vendor.hoverClasses}`}
+                          >
+                            {/* Logo square bubble */}
+                            <div className="w-12 h-12 rounded-xl bg-white border border-slate-100 flex items-center justify-center shadow-[0_2px_6px_rgba(15,23,42,0.01)] transition-all duration-300 group-hover/card:border-slate-200/50 group-hover/card:scale-105">
+                              <div className="flex items-center justify-center grayscale opacity-60 group-hover/card:grayscale-0 group-hover/card:opacity-100 transition-all duration-300">
+                                {vendor.logo}
+                              </div>
                             </div>
-                            <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
-                              <div className={`h-full rounded-full ${item.color} ${item.fill}`} />
+
+                            {/* Vendor Labels */}
+                            <div className="mt-3.5 space-y-0.5">
+                              <span className="block text-xs font-black text-slate-800 tracking-tight group-hover/card:text-slate-900">{vendor.name}</span>
+                              <span className="block text-[10px] font-bold text-slate-400 group-hover/card:text-slate-500 mt-0.5">{vendor.subText}</span>
                             </div>
                           </div>
                         ))}
                       </div>
                     </div>
+
+                    {/* BOTTOM ROW: Invoice Overview & Open Tickets */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                      {/* Yearly Orders Chart (col-span-2) */}
+                      <div className="md:col-span-2 bg-white border border-slate-200/50 rounded-[24px] p-5 shadow-sm flex flex-col gap-4 text-left justify-between">
+                        {/* Header */}
+                        <div className="flex justify-between items-center">
+                          <h2 className="text-xs font-black text-slate-500 uppercase tracking-wider">Yearly Orders</h2>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400">Select Year:</span>
+                            <select
+                              value={selectedYear}
+                              onChange={(e) => {
+                                setSelectedYear(e.target.value)
+                                triggerToast(`Viewing orders for year ${e.target.value}`)
+                              }}
+                              className="bg-slate-50 border border-slate-200 rounded-xl py-1 px-3 text-xs text-slate-700 font-bold outline-none focus:border-[#f41b5d]/30 transition-all cursor-pointer shadow-sm"
+                            >
+                              <option value="2026">2026</option>
+                              <option value="2025">2025</option>
+                              <option value="2024">2024</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Chart Subtitle & Legend */}
+                        <div className="flex justify-between items-center text-xs font-bold text-slate-400 px-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[11px] text-slate-500 font-black">Order Bar Chart</span>
+                            <span className="text-[10px] text-slate-400 font-medium">|</span>
+                            <span className="text-[11px] text-slate-400 font-semibold">Total: <span className="text-slate-800 font-black">{yearlyOrdersData[selectedYear]?.reduce((acc, curr) => acc + curr.count, 0) || 0}</span></span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="w-2.5 h-2.5 rounded-sm bg-gradient-to-t from-[#1b88e6] to-[#4ea8de]" />
+                            <span className="text-slate-500">Orders</span>
+                          </div>
+                        </div>
+
+                        {/* Chart Visualizer */}
+                        <div className="flex-1 flex items-stretch gap-3 mt-2 h-44 relative">
+                          {/* Y-Axis Labels */}
+                          <div className="flex flex-col justify-between text-[9px] font-extrabold text-slate-400 select-none pb-5 text-right w-5">
+                            <span>25</span>
+                            <span>20</span>
+                            <span>15</span>
+                            <span>10</span>
+                            <span>5</span>
+                            <span>0</span>
+                          </div>
+
+                          {/* Chart Grid & Bars */}
+                          <div className="flex-1 flex flex-col justify-between relative min-w-0">
+                            {/* Horizontal Grid Lines */}
+                            <div className="absolute inset-0 flex flex-col justify-between pointer-events-none pb-5">
+                              {[0, 1, 2, 3, 4, 5].map((idx) => (
+                                <div key={idx} className="border-t border-slate-100/70 w-full h-0" />
+                              ))}
+                            </div>
+
+                            {/* Columns container (standing on the baseline grid line) */}
+                            <div className="flex-1 flex items-end justify-between relative z-10 px-2 pb-5">
+                              {(yearlyOrdersData[selectedYear] || []).map((item, idx) => {
+                                const heightPct = (item.count / 25) * 100
+                                return (
+                                  <div key={idx} className="flex flex-col items-center flex-1 h-full justify-end relative group px-0.5 max-w-[40px]">
+                                    {/* Tooltip */}
+                                    <div className="absolute -top-9 bg-slate-900 text-white text-[10px] font-bold py-1 px-2.5 rounded-xl shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-20 whitespace-nowrap flex flex-col items-center">
+                                      <span>{item.count} Orders</span>
+                                      <div className="w-1.5 h-1.5 bg-slate-900 rotate-45 -mt-0.5" />
+                                    </div>
+
+                                    {/* Bar element */}
+                                    <div
+                                      style={{ height: `${heightPct}%` }}
+                                      className={`w-full bg-gradient-to-t from-[#1b88e6] to-[#4ea8de] rounded-t-md transition-all duration-300 hover:scale-x-105 hover:from-[#f41b5d] hover:to-[#ff5c8a] cursor-pointer shadow-sm relative overflow-hidden`}
+                                    >
+                                      {/* Highlight glow effect on hover */}
+                                      <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
+
+                            {/* X-Axis labels */}
+                            <div className="absolute bottom-0 left-0 right-0 flex justify-between px-2 text-[9px] font-extrabold text-slate-400 select-none font-sans">
+                              {(yearlyOrdersData[selectedYear] || []).map((item, idx) => (
+                                <div key={idx} className="flex-1 text-center max-w-[40px]">
+                                  {item.month}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Open Tickets (col-span-1) */}
+                      <div className="md:col-span-1 bg-white border border-slate-200/50 rounded-[24px] p-5 shadow-sm flex flex-col gap-4 text-left">
+                        <div className="flex justify-between items-center">
+                          <h2 className="text-xs font-black text-slate-500 uppercase tracking-wider">Open Tickets</h2>
+                          <button onClick={() => triggerToast('Ticket Settings...')} className="w-6 h-6 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-800 cursor-pointer">
+                            <SlidersHorizontal className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        {/* Tickets List */}
+                        <div className="flex flex-col gap-4">
+                          {customers.slice(0, 3).map((cust, idx) => {
+                            const names = ['Jacob Martinez', 'Luke Bell', 'Connor Mitchell']
+                            const name = names[idx % names.length]
+                            const avatarColors = [
+                              'from-pink-400 to-indigo-500',
+                              'from-teal-400 to-emerald-500',
+                              'from-purple-400 to-indigo-500'
+                            ]
+                            const ac = avatarColors[idx % avatarColors.length]
+
+                            return (
+                              <div key={cust.id} className="flex gap-3 items-start border-b border-slate-100 pb-3 last:border-b-0 last:pb-0">
+                                <div className={`w-8 h-8 rounded-full bg-gradient-to-tr ${ac} flex items-center justify-center text-[10px] font-black text-white shadow-sm shrink-0`}>
+                                  {name.split(' ').map(n => n[0]).join('')}
+                                </div>
+                                <div className="flex-1 min-w-0 space-y-1">
+                                  <span className="text-xs font-black text-slate-800 block">{name}</span>
+                                  <p className="text-[10px] text-slate-500 font-semibold leading-relaxed">
+                                    I need 3 more new features on the mobile app design for tenant <span className="font-bold text-slate-700">{cust.domainPrefix}</span>.
+                                  </p>
+                                  <button
+                                    onClick={() => {
+                                      setCustomerPrefixFilter(cust.domainPrefix)
+                                      setAppliedCustomerFilters({ prefix: cust.domainPrefix })
+                                      handleNav('customers')
+                                    }}
+                                    className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-750 px-4 py-1.5 rounded-xl text-[10px] font-bold transition-all inline-flex items-center gap-1 cursor-pointer shadow-sm mt-1"
+                                  >
+                                    <span>Check</span>
+                                    <ChevronRight className="w-3 h-3" />
+                                  </button>
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* COLUMN 3: Right Panels (col-span-3) */}
-                  <div className="lg:col-span-3 flex flex-col gap-6">
-                    {/* My Meetings */}
-                    <div className="bg-white border border-slate-200/50 rounded-[24px] p-5 shadow-sm flex flex-col gap-4">
-                      <div className="flex justify-between items-center">
-                        <h2 className="text-xs font-black text-slate-500 uppercase tracking-wider">My Meetings</h2>
-                        <button onClick={() => triggerToast('Opening Calendar...')} className="w-6 h-6 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-800 cursor-pointer">
-                          <Calendar className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-
-                      {/* Meetings List */}
-                      <div className="flex flex-col gap-3">
-                        {renewals.slice(0, 2).map((item, idx) => {
-                          const isMicrosoft = item.product.toLowerCase().includes('microsoft')
-                          return (
-                            <div 
-                              key={idx} 
-                              onClick={() => {
-                                setRenewalDomainFilter(item.customer)
-                                setAppliedRenewalFilters({ domain: item.customer, product: '' })
-                                handleNav('renewals')
-                              }}
-                              className="border border-slate-100 bg-slate-50/50 hover:bg-slate-50 rounded-2xl p-4 flex flex-col gap-3 transition-all hover:scale-[1.01] cursor-pointer"
-                            >
-                              <div className="flex justify-between items-center">
-                                <div className="flex items-baseline gap-2">
-                                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">My Meetings</span>
-                                  <span className="text-xs font-black text-slate-800 truncate max-w-[120px]">{item.customer.split('.')[0]}</span>
-                                </div>
-                                <button className="w-6 h-6 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-800 cursor-pointer">
-                                  <ArrowUpRight className="w-3.5 h-3.5" />
-                                </button>
-                              </div>
-
-                              <div className="flex items-center justify-between text-xs font-bold text-slate-800">
-                                <div className="flex items-center gap-1.5 text-slate-500">
-                                  <Clock className="w-3.5 h-3.5 text-slate-400" />
-                                  <span>{item.dueDays} Days Due</span>
-                                </div>
-                                
-                                <div className="flex items-center gap-1.5 text-slate-500">
-                                  <span className={`w-2 h-2 rounded-full ${isMicrosoft ? 'bg-emerald-400' : 'bg-blue-400'}`} />
-                                  <span>{isMicrosoft ? 'Meet' : 'Zoom'}</span>
-                                </div>
-                              </div>
-                            </div>
-                          )
-                        })}
-                      </div>
-
-                      {/* See All Meetings */}
-                      <button onClick={() => handleNav('renewals')} className="text-[10px] font-black text-slate-500 hover:text-slate-850 text-left mt-1 cursor-pointer">
-                        See All Meetings &gt;
+                  {/* COLUMN 1: Notifications (col-span-3) */}
+                  <div className="lg:col-span-3 bg-white border border-slate-200/50 rounded-[24px] p-5 shadow-sm flex flex-col gap-4">
+                    {/* Notifications Header */}
+                    <div className="flex justify-between items-center">
+                      <h2 className="text-xs font-black text-slate-500 uppercase tracking-wider">Notifications</h2>
+                      <button onClick={() => triggerToast('Opening settings...')} className="w-6 h-6 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-50 transition-colors">
+                        <Settings className="w-3.5 h-3.5" />
                       </button>
                     </div>
 
-                    {/* Open Tickets */}
-                    <div className="bg-white border border-slate-200/50 rounded-[24px] p-5 shadow-sm flex flex-col gap-4 text-left">
-                      <div className="flex justify-between items-center">
-                        <h2 className="text-xs font-black text-slate-500 uppercase tracking-wider">Open Tickets</h2>
-                        <button onClick={() => triggerToast('Ticket Settings...')} className="w-6 h-6 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-800 cursor-pointer">
-                          <SlidersHorizontal className="w-3.5 h-3.5" />
+                    {/* Subtabs */}
+                    <div className="flex bg-slate-100 p-0.5 rounded-full text-[10px] font-bold text-slate-500 shadow-inner">
+                      {(['All', 'Unread'] as const).map((t) => (
+                        <button
+                          key={t}
+                          onClick={() => {
+                            setActiveNotificationFilter(t)
+                            triggerToast(`Showing ${t.toLowerCase()} notifications`)
+                          }}
+                          className={`flex-1 py-1.5 rounded-full transition-all cursor-pointer ${activeNotificationFilter === t ? 'bg-slate-900 text-white shadow-sm' : 'hover:text-slate-900'}`}
+                        >
+                          {t}
                         </button>
-                      </div>
-
-                      {/* Tickets List */}
-                      <div className="flex flex-col gap-4">
-                        {customers.slice(0, 3).map((cust, idx) => {
-                          const names = ['Jacob Martinez', 'Luke Bell', 'Connor Mitchell']
-                          const name = names[idx % names.length]
-                          const avatarColors = [
-                            'from-pink-400 to-indigo-500',
-                            'from-teal-400 to-emerald-500',
-                            'from-purple-400 to-indigo-500'
-                          ]
-                          const ac = avatarColors[idx % avatarColors.length]
-
-                          return (
-                            <div key={cust.id} className="flex gap-3 items-start border-b border-slate-100 pb-3 last:border-b-0 last:pb-0">
-                              <div className={`w-8 h-8 rounded-full bg-gradient-to-tr ${ac} flex items-center justify-center text-[10px] font-black text-white shadow-sm shrink-0`}>
-                                {name.split(' ').map(n => n[0]).join('')}
-                              </div>
-                              <div className="flex-1 min-w-0 space-y-1">
-                                <span className="text-xs font-black text-slate-800 block">{name}</span>
-                                <p className="text-[10px] text-slate-500 font-semibold leading-relaxed">
-                                  I need 3 more new features on the mobile app design for tenant <span className="font-bold text-slate-700">{cust.domainPrefix}</span>.
-                                </p>
-                                <button 
-                                  onClick={() => {
-                                    setCustomerPrefixFilter(cust.domainPrefix)
-                                    setAppliedCustomerFilters({ prefix: cust.domainPrefix })
-                                    handleNav('customers')
-                                  }}
-                                  className="bg-white border border-slate-200 hover:bg-slate-50 text-slate-750 px-4 py-1.5 rounded-xl text-[10px] font-bold transition-all inline-flex items-center gap-1 cursor-pointer shadow-sm mt-1"
-                                >
-                                  <span>Check</span>
-                                  <ChevronRight className="w-3 h-3" />
-                                </button>
-                              </div>
-                            </div>
-                          )
-                        })}
-                      </div>
+                      ))}
                     </div>
+
+                    {/* Dropdown status selection */}
+                    {(() => {
+                      const filteredNotifications = notifications.filter(n => activeNotificationFilter === 'Unread' ? n.unread : true)
+                      return (
+                        <>
+                          <button className="flex items-center justify-between border border-slate-200 rounded-full px-3.5 py-1.5 text-[10px] font-bold text-slate-500 hover:bg-slate-50 transition-colors w-full">
+                            <div className="flex items-center gap-1.5">
+                              <span className="w-4 h-4 rounded-full bg-slate-900 text-white flex items-center justify-center text-[8px] font-black">
+                                {filteredNotifications.length}
+                              </span>
+                              <span>Recent Notifications</span>
+                            </div>
+                            <ChevronDown className="w-3 h-3 text-slate-400" />
+                          </button>
+
+                          {/* Notifications List */}
+                          <div className="flex flex-col gap-3 flex-1 overflow-y-auto pr-1 no-scrollbar">
+                            {filteredNotifications.length === 0 ? (
+                              <div className="text-center py-6 text-slate-400 text-xs font-semibold">
+                                No unread notifications
+                              </div>
+                            ) : (
+                              filteredNotifications.map((n) => {
+                                const getColorsAndIcon = (type: string) => {
+                                  if (type === 'exchange') {
+                                    return {
+                                      bg: 'bg-violet-50/40 border-violet-100/60',
+                                      text: 'text-violet-900',
+                                      logoBg: 'bg-violet-100 text-violet-600',
+                                      icon: <Mail className="w-3.5 h-3.5" />
+                                    }
+                                  }
+                                  // Default / microsoft
+                                  return {
+                                    bg: 'bg-blue-50/40 border-blue-100/60',
+                                    text: 'text-blue-900',
+                                    logoBg: 'bg-blue-100 text-blue-600',
+                                    icon: (
+                                      <svg className="w-3 h-3" viewBox="0 0 23 23" fill="none">
+                                        <rect x="0" y="0" width="10.5" height="10.5" fill="#f25022" />
+                                        <rect x="12.5" y="0" width="10.5" height="10.5" fill="#7fba00" />
+                                        <rect x="0" y="12.5" width="10.5" height="10.5" fill="#00a4ef" />
+                                        <rect x="12.5" y="12.5" width="10.5" height="10.5" fill="#ffb900" />
+                                      </svg>
+                                    )
+                                  }
+                                }
+                                const c = getColorsAndIcon(n.type)
+                                return (
+                                  <div key={n.id} className={`border rounded-2xl p-3.5 flex flex-col gap-3 text-left transition-all ${c.bg} relative group`}>
+                                    {/* Top Header of Card */}
+                                    <div className="flex justify-between items-center">
+                                      <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-black text-xs shadow-sm ${c.logoBg}`}>
+                                        {c.icon}
+                                      </div>
+                                      {n.unread && (
+                                        <button
+                                          onClick={() => {
+                                            setNotifications(prev => prev.map(item => item.id === n.id ? { ...item, unread: false } : item))
+                                            triggerToast(`Marked as read!`)
+                                          }}
+                                          className="w-5 h-5 rounded-full border border-slate-300 hover:border-emerald-500 text-slate-400 hover:text-emerald-500 transition-colors bg-white shadow-sm cursor-pointer flex items-center justify-center"
+                                          title="Mark as read"
+                                        >
+                                          <Check className="w-3 h-3 stroke-[3]" />
+                                        </button>
+                                      )}
+                                    </div>
+
+                                    {/* Content */}
+                                    <div className="space-y-1">
+                                      <h4 className="text-xs font-black text-slate-800 leading-tight">{n.title}</h4>
+                                      <p className="text-[10px] text-slate-500 leading-normal font-semibold">{n.text}</p>
+                                    </div>
+
+                                    {/* Footer */}
+                                    <div className="flex items-center justify-between text-[8px] font-bold text-slate-400">
+                                      <div className="flex items-center gap-1">
+                                        <Clock className="w-2.5 h-2.5" />
+                                        <span>{n.time}</span>
+                                      </div>
+                                      {n.unread && (
+                                        <span className="bg-blue-600 text-white px-1.5 py-0.5 rounded-full text-[7px] font-black uppercase tracking-wider">Unread</span>
+                                      )}
+                                    </div>
+                                  </div>
+                                )
+                              })
+                            )}
+                          </div>
+                        </>
+                      )
+                    })()}
+                  </div>
+                </div>
+
+                {/* RECENT RENEWALS Section */}
+                <div className="bg-white border border-slate-200/50 rounded-[24px] p-5 shadow-sm mt-6">
+                  <div className="flex justify-between items-center mb-6">
+                    <div className="space-y-1 text-left">
+                      <h2 className="text-xs font-black text-slate-500 uppercase tracking-wider">RECENT RENEWALS</h2>
+                      <p className="text-[10px] text-slate-400 font-semibold">Track and process upcoming license expirations</p>
+                    </div>
+                    <button
+                      onClick={() => handleNav('renewals')}
+                      className="text-[10px] font-black text-[#f41b5d] uppercase tracking-wider hover:underline cursor-pointer flex items-center gap-1"
+                    >
+                      <span>Detailed Renewal List</span>
+                      <span>&rarr;</span>
+                    </button>
                   </div>
 
+                  <div className="overflow-x-auto -mx-5 -mb-5 border-t border-slate-100">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-slate-50 text-[10px] font-bold text-slate-400 uppercase border-b border-slate-100">
+                          <th className="py-3.5 px-5">End Customer</th>
+                          <th className="py-3.5 px-5">Product Name</th>
+                          <th className="py-3.5 px-5 text-center">Qty</th>
+                          <th className="py-3.5 px-5">Amount</th>
+                          <th className="py-3.5 px-5">End Date</th>
+                          <th className="py-3.5 px-5">Due Days</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-100 text-xs font-semibold text-slate-650">
+                        {[
+                          {
+                            customer: 'qorenetworks',
+                            product: 'Microsoft 365 Business Basic',
+                            qty: 1,
+                            amount: '$ 22.31',
+                            endDate: '2026-06-01',
+                            dueDays: 'Cancelled'
+                          },
+                          {
+                            customer: 'unitedenergyconstruction.onmicrosoft.com',
+                            product: 'Exchange Online (Plan 1)',
+                            qty: 1,
+                            amount: 'Not Found',
+                            endDate: '2026-06-03',
+                            dueDays: 'Cancelled'
+                          },
+                          {
+                            customer: 'oilfieldsscenter.onmicrosoft.com',
+                            product: 'Exchange Online (Plan 2)',
+                            qty: 1,
+                            amount: 'Not Found',
+                            endDate: '2026-06-04',
+                            dueDays: 'Cancelled'
+                          },
+                          {
+                            customer: 'security360bd1',
+                            product: 'Microsoft 365 Business Basic',
+                            qty: 1,
+                            amount: '$ 22.31',
+                            endDate: '2026-06-20',
+                            dueDays: 'Cancelled'
+                          },
+                          {
+                            customer: 'rusbizrealestate.onmicrosoft.com',
+                            product: 'Microsoft 365 Business Standard',
+                            qty: 3,
+                            amount: 'Not Found',
+                            endDate: '2026-06-21',
+                            dueDays: 'Cancelled'
+                          }
+                        ].map((item, idx) => (
+                          <tr
+                            key={idx}
+                            className={`hover:bg-slate-50/50 transition-colors ${idx % 2 === 1 ? 'bg-slate-50/30' : 'bg-white'}`}
+                          >
+                            <td className="py-4 px-5 text-slate-800 font-bold">{item.customer}</td>
+                            <td className="py-4 px-5 text-slate-600 font-medium">{item.product}</td>
+                            <td className="py-4 px-5 text-center text-slate-500 font-bold">{item.qty}</td>
+                            <td className="py-4 px-5 text-slate-700 font-bold">
+                              {item.amount === 'Not Found' ? (
+                                <span className="text-slate-400 font-semibold">Not Found</span>
+                              ) : (
+                                item.amount
+                              )}
+                            </td>
+                            <td className="py-4 px-5 text-slate-400 font-bold">{item.endDate}</td>
+                            <td className="py-4 px-5 text-[#f41b5d] font-black">{item.dueDays}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
+
               </div>
             )}
 
@@ -1138,8 +1530,8 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
                             <td className="py-4 px-6 text-center text-slate-400">{o.date}</td>
                             <td className="py-4 px-6 text-center">
                               <span className={`inline-flex items-center gap-1 py-1 px-2.5 rounded-full text-[10px] font-bold ${o.status === 'Active'
-                                  ? 'bg-emerald-100 text-emerald-700'
-                                  : 'bg-rose-100 text-rose-700'
+                                ? 'bg-emerald-100 text-emerald-700'
+                                : 'bg-rose-100 text-rose-700'
                                 }`}>
                                 {o.status === 'Active' ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                                 {o.status}
@@ -1250,10 +1642,10 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
                             <td className="py-4 px-6 text-center text-slate-500 font-bold">{r.endDate}</td>
                             <td className="py-4 px-6 text-center">
                               <span className={`inline-block py-1 px-2.5 rounded-full text-[10px] font-extrabold ${r.dueDays <= 20
-                                  ? 'bg-rose-100 text-rose-700 animate-pulse'
-                                  : r.dueDays <= 30
-                                    ? 'bg-amber-100 text-amber-700'
-                                    : 'bg-emerald-100 text-emerald-700'
+                                ? 'bg-rose-100 text-rose-700 animate-pulse'
+                                : r.dueDays <= 30
+                                  ? 'bg-amber-100 text-amber-700'
+                                  : 'bg-emerald-100 text-emerald-700'
                                 }`}>
                                 {r.dueDays} Days
                               </span>
@@ -1536,14 +1928,20 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
         <div className="lg:hidden fixed inset-0 z-[1000] bg-slate-900/40 backdrop-blur-sm animate-fadeIn" onClick={() => setMobileMenuOpen(false)}>
-          <div 
+          <div
             className="absolute left-0 top-0 bottom-0 w-64 bg-white border-r border-slate-200 p-6 flex flex-col gap-6 animate-slideInLeft"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center pb-4 border-b border-slate-100">
-              <div className="flex flex-col text-left">
-                <span className="text-lg font-black tracking-tight text-slate-900">saasorder</span>
-                <span className="text-[9px] uppercase tracking-widest font-extrabold text-slate-400 -mt-1 pl-0.5">studio.</span>
+              <div className="flex items-center text-left">
+                <Image
+                  src="/logo_03.png"
+                  alt="SaaS Order Logo"
+                  width={110}
+                  height={36}
+                  className="h-9 w-auto object-contain"
+                  priority
+                />
               </div>
               <button onClick={() => setMobileMenuOpen(false)} className="w-7 h-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 cursor-pointer">
                 <X className="w-4 h-4" />
@@ -1565,11 +1963,10 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
                   <button
                     key={item.id}
                     onClick={() => { handleNav(item.id as DashboardTab); setMobileMenuOpen(false); }}
-                    className={`text-left text-xs font-bold py-3 px-4 rounded-xl transition-all cursor-pointer flex items-center gap-3 ${
-                      isActive
-                        ? 'text-[#f41b5d] bg-[#fdf2f4]'
-                        : 'text-slate-600 hover:text-[#f41b5d] hover:bg-slate-50'
-                    }`}
+                    className={`text-left text-xs font-bold py-3 px-4 rounded-xl transition-all cursor-pointer flex items-center gap-3 ${isActive
+                      ? 'text-[#f41b5d] bg-[#fdf2f4]'
+                      : 'text-slate-600 hover:text-[#f41b5d] hover:bg-slate-50'
+                      }`}
                   >
                     {item.id === 'vendors' ? <ShoppingCart className="w-4.5 h-4.5" /> : <Icon className="w-4.5 h-4.5" />}
                     <span>{item.label}</span>
@@ -1607,8 +2004,8 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
                       type="button"
                       onClick={() => setTopUpCurrency(curr)}
                       className={`py-2 px-3 border rounded-xl font-extrabold text-xs transition-all ${topUpCurrency === curr
-                          ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
-                          : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                        : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                         }`}
                     >
                       {curr}
@@ -1689,7 +2086,7 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
             </div>
 
             <div className="bg-slate-50 p-4 border-t border-slate-100 flex justify-end">
-              <button 
+              <button
                 onClick={() => setTopUpHistoryModalOpen(false)}
                 className="bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-xl transition-all text-xs cursor-pointer"
               >
