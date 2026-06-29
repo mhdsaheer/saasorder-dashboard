@@ -37,11 +37,135 @@ import {
   CreditCard,
   Percent,
   Download,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Edit2,
+  Award,
+  Key,
+  Copy,
+  Eye,
+  EyeOff
 } from 'lucide-react'
 
 // Tab type definition
 export type DashboardTab = 'dashboard' | 'vendors' | 'customers' | 'orders' | 'renewals' | 'profile' | 'contact' | 'erp'
+
+interface ChartDataPoint {
+  label: string
+  orders: number
+  revenue: number
+  date: string
+}
+
+const transactionChartData: Record<'week' | 'month' | 'year', ChartDataPoint[]> = {
+  week: [
+    { label: 'Mon', orders: 12, revenue: 480, date: 'June 22, 2026' },
+    { label: 'Tue', orders: 18, revenue: 720, date: 'June 23, 2026' },
+    { label: 'Wed', orders: 15, revenue: 580, date: 'June 24, 2026' },
+    { label: 'Thu', orders: 25, revenue: 980, date: 'June 25, 2026' },
+    { label: 'Fri', orders: 22, revenue: 850, date: 'June 26, 2026' },
+    { label: 'Sat', orders: 30, revenue: 1200, date: 'June 27, 2026' },
+    { label: 'Sun', orders: 28, revenue: 1100, date: 'June 28, 2026' },
+  ],
+  month: [
+    { label: 'Jun 1', orders: 65, revenue: 2600, date: 'Jun 1 - Jun 5' },
+    { label: 'Jun 6', orders: 88, revenue: 3520, date: 'Jun 6 - Jun 10' },
+    { label: 'Jun 11', orders: 72, revenue: 2880, date: 'Jun 11 - Jun 15' },
+    { label: 'Jun 16', orders: 95, revenue: 3800, date: 'Jun 16 - Jun 20' },
+    { label: 'Jun 21', orders: 110, revenue: 4400, date: 'Jun 21 - Jun 25' },
+    { label: 'Jun 26', orders: 105, revenue: 4200, date: 'Jun 26 - Jun 30' },
+  ],
+  year: [
+    { label: 'Jan', orders: 62, revenue: 2480, date: 'January 2026' },
+    { label: 'Feb', orders: 58, revenue: 2320, date: 'February 2026' },
+    { label: 'Mar', orders: 70, revenue: 2800, date: 'March 2026' },
+    { label: 'Apr', orders: 85, revenue: 3400, date: 'April 2026' },
+    { label: 'May', orders: 92, revenue: 3680, date: 'May 2026' },
+    { label: 'Jun', orders: 110, revenue: 4400, date: 'June 2026' },
+    { label: 'Jul', orders: 95, revenue: 3800, date: 'July 2026' },
+    { label: 'Aug', orders: 88, revenue: 3520, date: 'August 2026' },
+    { label: 'Sep', orders: 102, revenue: 4080, date: 'September 2026' },
+    { label: 'Oct', orders: 115, revenue: 4600, date: 'October 2026' },
+    { label: 'Nov', orders: 120, revenue: 4800, date: 'November 2026' },
+    { label: 'Dec', orders: 135, revenue: 5400, date: 'December 2026' },
+  ]
+}
+
+const renderVendorLogo = (logoKey: string, sizeClass = "w-5.5 h-5.5") => {
+  switch (logoKey.toLowerCase()) {
+    case 'microsoft':
+      return (
+        <svg className={sizeClass} viewBox="0 0 23 23" fill="none">
+          <rect x="0" y="0" width="10.5" height="10.5" fill="#f25022" />
+          <rect x="11.5" y="0" width="10.5" height="10.5" fill="#7fba00" />
+          <rect x="0" y="11.5" width="10.5" height="10.5" fill="#00a4ef" />
+          <rect x="11.5" y="11.5" width="10.5" height="10.5" fill="#ffb900" />
+        </svg>
+      )
+    case 'google':
+      return (
+        <svg className={sizeClass} viewBox="0 0 24 24" fill="none">
+          <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+          <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+          <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z" fill="#FBBC05" />
+          <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
+        </svg>
+      )
+    case 'zoho':
+      return (
+        <svg className={sizeClass} viewBox="0 0 24 24" fill="none">
+          <rect x="1.5" y="1.5" width="9.5" height="9.5" rx="2.2" fill="#E42527" />
+          <text x="6.25" y="6.75" fill="#ffffff" fontFamily="sans-serif" fontWeight="900" fontSize="7.5" textAnchor="middle" dominantBaseline="central">Z</text>
+
+          <rect x="13" y="1.5" width="9.5" height="9.5" rx="2.2" fill="#226DB4" />
+          <text x="17.75" y="6.75" fill="#ffffff" fontFamily="sans-serif" fontWeight="900" fontSize="7.5" textAnchor="middle" dominantBaseline="central">O</text>
+
+          <rect x="1.5" y="13" width="9.5" height="9.5" rx="2.2" fill="#089949" />
+          <text x="6.25" y="18.25" fill="#ffffff" fontFamily="sans-serif" fontWeight="900" fontSize="7.5" textAnchor="middle" dominantBaseline="central">H</text>
+
+          <rect x="13" y="13" width="9.5" height="9.5" rx="2.2" fill="#F9B21D" />
+          <text x="17.75" y="18.25" fill="#ffffff" fontFamily="sans-serif" fontWeight="900" fontSize="7.5" textAnchor="middle" dominantBaseline="central">O</text>
+        </svg>
+      )
+    case 'aws':
+      return (
+        <svg className={sizeClass} viewBox="0 0 24 24" fill="none">
+          <rect width="24" height="24" rx="5.5" fill="#232f3e" />
+          <text x="12" y="10.5" fill="#ffffff" fontFamily="sans-serif" fontWeight="950" fontSize="7.5" textAnchor="middle" dominantBaseline="central">aws</text>
+          <path d="M6 14.5c3.5 2.2 8.5 2.2 12 0" stroke="#ff9900" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M17.2 14.2l1 1.2-1.2.2" stroke="#ff9900" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      )
+    case 'redhat':
+      return (
+        <svg className={sizeClass} viewBox="0 0 32 32" fill="none">
+          <path d="M28 20c-1.5-1.5-4-2.5-7.5-2.8-.8-.1-1.5-.5-1.8-1.2C18 14 17 9 12.5 9 9.5 9 7.5 11 7.5 13c0 2 2.5 3.5 5 4.5 2 .8 3.5 2 4.3 3.5.5.9.5 2-.1 2.8C15 26 10.5 26 6 23.5c-.8-.4-1.8-.1-2.2.7s-.1 1.8.7 2.2C10 29.5 16 30 20.5 27.5c2.3-1.3 3.5-3.5 3.5-5.5 0-.8-.3-1.5-.7-2z" fill="#cc0000" />
+          <path d="M12.5 11.5c1.4 0 2.2 1.6 2.8 3.5.2.7.9 1.2 1.7 1.2 2 .1 3.5.6 4.5 1.3.2.1.4-.1.3-.3-.8-1.5-2.2-2.5-3.8-3-1.1-.3-2.1-1-2.7-2.1-.9-1.5-2.1-2.1-3.8-2.1-2.5 0-4.5 1.5-4.5 3.5 0 .5.3.8.7.8.8-.1 2.1-.8 2.1-2.8z" fill="#ffffff" opacity="0.8" />
+        </svg>
+      )
+    case 'sophos':
+      return (
+        <svg className={sizeClass} viewBox="0 0 24 24" fill="none">
+          <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z" fill="#002f6c" />
+          <path d="M12 6a3 3 0 00-3 3v2H8v6h8v-6h-1V9a3 3 0 00-3-3zm1.5 5h-3V9a1.5 1.5 0 013 0v2z" fill="#ffffff" />
+        </svg>
+      )
+    case 'acronis':
+      return (
+        <svg className={sizeClass} viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="12" r="11" fill="#009bf5" />
+          <path d="M12 6.5a4 4 0 00-4 4v3.5a4 4 0 008 0v-3.5a4 4 0 00-4-4zm2 7.5h-4v-3.5a2 2 0 114 0v3.5z" fill="#ffffff" />
+        </svg>
+      )
+    case 'dropbox':
+      return (
+        <svg className={sizeClass} viewBox="0 0 24 24" fill="none">
+          <path d="M6 2L0 6l6 4 6-4-6-4zm12 0l-6 4 6 4 6-4-6-4zM0 14l6-4 6 4-6 4-6-4zm24 0l-6-4-6 4 6 4 6-4zM6 19.5l6-3.75 6 3.75-6 4.25-6-4.25z" fill="#0061FE" />
+        </svg>
+      )
+    default:
+      return null
+  }
+}
 
 interface DashboardContainerProps {
   initialTab?: DashboardTab
@@ -79,6 +203,12 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
   // --- MOCK DATABASE STATE ---
   // Selected Year for Yearly Orders Chart
   const [selectedYear, setSelectedYear] = useState('2026')
+  const [activeCustomerBar, setActiveCustomerBar] = useState('MS (Ind)')
+
+  // Timeframe and Metric state for Transaction Activity Chart
+  const [chartTimeRange, setChartTimeRange] = useState<'week' | 'month' | 'year'>('week')
+  const [chartMetric, setChartMetric] = useState<'orders' | 'revenue'>('orders')
+  const [hoveredChartIndex, setHoveredChartIndex] = useState<number | null>(null)
 
   // Yearly Orders Data
   const yearlyOrdersData: Record<string, { month: string; count: number }[]> = {
@@ -236,6 +366,7 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
   const [regionDropdownOpen, setRegionDropdownOpen] = useState(false)
   const [walletDropdownOpen, setWalletDropdownOpen] = useState(false)
   const [notificationPanelOpen, setNotificationPanelOpen] = useState(false)
+  const [isEditingEmail, setIsEditingEmail] = useState(false)
 
 
   // --- FILTERS STATE ---
@@ -400,7 +531,9 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
     { name: 'Zoho Mail Lite - Global', group: 'Zoho - Zoho Mail', priceStr: '$1.00', priceVal: '$0.80/user/month', priceNum: 0.80, discount: '20.0% discount', logo: 'zoho', currency: 'USD' },
     { name: 'Sophos Intercept X Essentials', group: 'Sophos - Security', priceStr: '$3.50', priceVal: '$2.97/user/month', priceNum: 2.97, discount: '15.1% discount', logo: 'sophos', currency: 'USD' },
     { name: 'Acronis Cyber Protect Cloud - Global', group: 'Acronis - Backup', priceStr: '$12.00', priceVal: '$9.60/user/month', priceNum: 9.60, discount: '20.0% discount', logo: 'acronis', currency: 'USD' },
-    { name: 'AWS Dedicated Instance Provisioning', group: 'AWS - Cloud', priceStr: '$0.010', priceVal: '$0.008/user/month', priceNum: 0.008, discount: '20.0% discount', logo: 'aws', currency: 'USD' }
+    { name: 'Red Hat Enterprise Linux Server - Global', group: 'Red Hat - Enterprise', priceStr: '$29.00', priceVal: '$24.00/user/month', priceNum: 24.00, discount: '17.2% discount', logo: 'redhat', currency: 'USD' },
+    { name: 'AWS Dedicated Instance Provisioning', group: 'AWS - Cloud', priceStr: '$0.010', priceVal: '$0.008/user/month', priceNum: 0.008, discount: '20.0% discount', logo: 'aws', currency: 'USD' },
+    { name: 'Dropbox Business Standard - Global', group: 'Dropbox - Cloud', priceStr: '$15.00', priceVal: '$12.00/user/month', priceNum: 12.00, discount: '20.0% discount', logo: 'dropbox', currency: 'USD' }
   ]
 
   const filteredShowcaseProducts = showcaseProducts.filter(p => {
@@ -418,15 +551,19 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
 
   // Dynamic Profile Info
   const [profile, setProfile] = useState({
-    givenName: 'Admin',
-    familyName: 'User',
-    email: 'admin@saasorder.com',
-    phone: '+91 844 844 2121',
-    street: '123 Enterprise Way',
-    city: 'Bangalore',
+    givenName: 'shafeeq',
+    familyName: 'M',
+    email: 'Shafeeqm@Dev.Febno.Com',
+    phone: '+919747986380',
+    street: 'Kinfra',
+    city: 'Kozhikode',
     country: 'India',
-    postalCode: '560001',
+    postalCode: '678910',
     organization: 'Febno Technologies',
+    taxId: 'GSTIN29AABCF1234L1ZV',
+    website: 'https://febno.com',
+    businessType: 'Technology Reseller',
+    partnerTier: 'Gold',
     twoFA: true
   })
 
@@ -434,6 +571,82 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
     e.preventDefault()
     triggerToast('Profile configuration saved successfully!')
   }
+
+  // Developer Credentials & Agreement Modal state
+  const [showSecret, setShowSecret] = useState(false)
+  const [secretKey, setSecretKey] = useState('sk_live_mock_key_value_xxxxxxxxxxxxxx')
+  const [showAgreementModal, setShowAgreementModal] = useState(false)
+
+  const handleCopy = (text: string, label: string) => {
+    navigator.clipboard.writeText(text)
+    triggerToast(`${label} copied to clipboard!`)
+  }
+
+  const handleRegenerateKeys = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    let newKey = 'sk_live_'
+    for (let i = 0; i < 32; i++) {
+      newKey += chars.charAt(Math.floor(Math.random() * chars.length))
+    }
+    setSecretKey(newKey)
+    triggerToast('API Credentials regenerated successfully!')
+  }
+
+  // --- TRANSACTIONS AREA CHART CALCULATIONS ---
+  const activeChartData = transactionChartData[chartTimeRange]
+  const chartValues = activeChartData.map(d => chartMetric === 'orders' ? d.orders : d.revenue)
+  const maxChartVal = Math.max(...chartValues) * 1.15 || 1
+  const chartPointsCount = activeChartData.length
+  const chartDx = chartPointsCount > 1 ? 440 / (chartPointsCount - 1) : 440
+
+  const chartPoints = activeChartData.map((d, i) => {
+    const val = chartMetric === 'orders' ? d.orders : d.revenue
+    const x = 35 + i * chartDx
+    const y = 160 - (val / maxChartVal) * 140
+    return { x, y, value: val, label: d.label, date: d.date }
+  })
+
+  const chartLinePath = chartPoints.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ')
+  const chartAreaPath = chartPoints.length > 0
+    ? `M ${chartPoints[0].x} 160 ` + chartPoints.map(p => `L ${p.x} ${p.y}`).join(' ') + ` L ${chartPoints[chartPoints.length - 1].x} 160 Z`
+    : ''
+
+  const formatChartYLabel = (val: number) => {
+    if (chartMetric === 'revenue') {
+      if (val >= 1000) {
+        return `$${(val / 1000).toFixed(1)}k`
+      }
+      return `$${val}`
+    }
+    return Math.round(val).toString()
+  }
+
+  // --- DYNAMIC SUMMARY STATS ---
+  const totalActiveOrders = activeChartData.reduce((sum, d) => sum + d.orders, 0)
+  const totalActiveRevenue = activeChartData.reduce((sum, d) => sum + d.revenue, 0)
+
+  const trendMetadata = {
+    week: {
+      volTrend: '+8.2% vs last week',
+      amtTrend: '+9.4%',
+      successRate: '99.2%',
+      successDetail: '+0.2% change'
+    },
+    month: {
+      volTrend: '+12% vs Q1',
+      amtTrend: '+14.1%',
+      successRate: '99.4%',
+      successDetail: 'High SLA'
+    },
+    year: {
+      volTrend: '+18.4% vs 2025',
+      amtTrend: '+21.2%',
+      successRate: '99.6%',
+      successDetail: 'Stable uptime'
+    }
+  }
+
+  const currentTrend = trendMetadata[chartTimeRange]
 
   return (
     <div className="h-screen w-full bg-[#f5f5f7] text-slate-800 font-sans flex flex-col antialiased overflow-hidden">
@@ -586,15 +799,32 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
 
             {/* Avatar Pill — hamburger visible only below lg */}
             <div
-              onClick={() => { setMobileMenuOpen(!mobileMenuOpen); setWalletDropdownOpen(false); setNotificationPanelOpen(false) }}
-              className="flex items-center gap-2.5 bg-white border border-slate-100 rounded-full lg:pr-1.5 lg:pl-1.5 pr-1.5 pl-4 py-1 shadow-sm hover:shadow transition-all cursor-pointer h-11 select-none"
+              className="flex items-center gap-2.5 bg-white border border-slate-100 rounded-full lg:pr-1.5 lg:pl-1.5 pr-1.5 pl-4 py-1 shadow-sm hover:shadow transition-all h-11 select-none"
             >
               {/* Hamburger — only on mobile/tablet */}
-              <svg className="lg:hidden w-5 h-3 text-slate-700 shrink-0" viewBox="0 0 20 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                <line x1="2" y1="3" x2="18" y2="3" />
-                <line x1="2" y1="9" x2="18" y2="9" />
-              </svg>
-              <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-100 shrink-0">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setMobileMenuOpen(!mobileMenuOpen)
+                  setWalletDropdownOpen(false)
+                  setNotificationPanelOpen(false)
+                }}
+                className="lg:hidden w-5 h-3 text-slate-700 shrink-0 flex items-center justify-center cursor-pointer focus:outline-none bg-transparent border-0"
+              >
+                <svg className="w-5 h-3" viewBox="0 0 20 12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="2" y1="3" x2="18" y2="3" />
+                  <line x1="2" y1="9" x2="18" y2="9" />
+                </svg>
+              </button>
+
+              <div
+                onClick={() => {
+                  handleNav('profile')
+                  setWalletDropdownOpen(false)
+                  setNotificationPanelOpen(false)
+                }}
+                className="w-8 h-8 rounded-full overflow-hidden border border-slate-100 shrink-0 cursor-pointer hover:opacity-90 transition-opacity"
+              >
                 <Image
                   src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100&q=80"
                   alt="User Profile"
@@ -616,6 +846,7 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
               { id: 'customers', label: 'Customers' },
               { id: 'orders', label: 'Orders' },
               { id: 'renewals', label: 'Renewals' },
+              { id: 'profile', label: 'Profile' },
             ].map((item) => {
               const isActive = activeTab === item.id
               return (
@@ -623,8 +854,8 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
                   key={item.id}
                   onClick={() => handleNav(item.id as DashboardTab)}
                   className={`px-5 py-2.5 rounded-full text-[13px] font-medium transition-all duration-200 cursor-pointer ${isActive
-                      ? 'bg-slate-950 text-white shadow-sm'
-                      : 'bg-white text-slate-500 border border-slate-200/80 hover:text-slate-900 hover:bg-slate-50 shadow-sm'
+                    ? 'bg-slate-950 text-white shadow-sm'
+                    : 'bg-white text-slate-500 border border-slate-200/80 hover:text-slate-900 hover:bg-slate-50 shadow-sm'
                     }`}
                 >
                   {item.label}
@@ -734,70 +965,83 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
                           <span>Place Order</span>
                           <ShoppingCart className="w-4 h-4 text-slate-500" />
                         </button>
-                        
+
                       </div>
                     </div>
                   </div>
 
-                  {/* ── Card 3: Order Success Rate (Bar Chart) ── */}
+                  {/* ── Card 3: Customer Management (Bar Chart) ── */}
                   <div className="lg:col-span-4 bg-white rounded-[28px] p-7 flex flex-col min-h-[320px] shadow-sm border border-slate-100 text-left">
                     <div className="flex justify-between items-start mb-2">
-                      <h2 className="text-[17px] font-bold text-slate-800">Order Success Rate</h2>
-                      <button onClick={() => triggerToast('Toggling chart view...')} className="w-7 h-7 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-700 cursor-pointer transition-colors">
-                        <ChevronDown className="w-3.5 h-3.5 rotate-180" />
+                      <h2 className="text-[17px] font-bold text-slate-800">Customer Management</h2>
+                      <button
+                        onClick={() => handleNav('customers')}
+                        className="text-[12.5px] font-bold text-slate-400 hover:text-[#f41b5d] transition-colors cursor-pointer flex items-center gap-0.5"
+                      >
+                        <span>All Customers</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
                     <div className="flex items-end gap-2 mb-1">
-                      <span className="text-[38px] font-extrabold text-slate-900 leading-none">70%</span>
+                      <span className="text-[38px] font-extrabold text-slate-900 leading-none">569</span>
                     </div>
-                    <p className="text-[12px] text-slate-400 font-medium mb-4">Retry success rate</p>
+                    <p className="text-[12px] text-slate-400 font-medium mb-4">Total Customers</p>
 
                     {/* Weekly bar chart with separate top pills and bottom striped blocks */}
-                    <div className="flex-1 flex items-end gap-2.5 mt-auto pb-1">
+                    <div className="flex-1 flex items-end gap-2 mt-auto pb-1">
                       {[
-                        { day: 'Mon', topH: 36, color: '#f0f4f8', active: false },
-                        { day: 'Tue', topH: 54, color: '#f0f4f8', active: false },
-                        { day: 'Wed', topH: 28, color: '#f0f4f8', active: false },
-                        { day: 'Thu', topH: 62, color: '#f0f4f8', active: false },
-                        { day: 'Fri', topH: 95, color: '#f97316', active: true },
-                        { day: 'Sat', topH: 50, color: '#f0f4f8', active: false },
-                        { day: 'Sun', topH: 40, color: '#f0f4f8', active: false },
-                      ].map((bar) => (
-                        <div key={bar.day} className="flex-1 flex flex-col items-center group">
-                          {/* Variable-height Top Pill */}
-                          <div className="w-full relative mb-1.5 flex flex-col justify-end" style={{ height: '110px' }}>
-                            {bar.active && (
-                              <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] font-bold px-2 py-0.5 rounded-[4px] whitespace-nowrap shadow-sm">
-                                67%
-                              </div>
-                            )}
-                            <div
-                              className={`w-full rounded-2xl relative transition-all duration-350 ${bar.active ? 'bg-[#f97316] shadow-sm' : 'bg-[#eef2f6]'
-                                }`}
-                              style={{ height: `${bar.topH}px` }}
-                            >
-                              {/* Centered white dot near top of non-active pills */}
-                              {!bar.active && (
-                                <span className="absolute top-2.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-white rounded-full opacity-90 shadow-sm" />
+                        { label: 'MS (Ind)', fullName: 'Microsoft (India)', value: 212, topH: 95 },
+                        { label: 'MS (Glb)', fullName: 'Microsoft (Global)', value: 157, topH: 70 },
+                        { label: 'Google', fullName: 'Google', value: 90, topH: 40 },
+                        { label: 'Zoho', fullName: 'Zoho', value: 45, topH: 22 },
+                        { label: 'AWS', fullName: 'AWS', value: 30, topH: 15 },
+                        { label: 'Sophos', fullName: 'Sophos', value: 20, topH: 11 },
+                        { label: 'Acronis', fullName: 'Acronis', value: 15, topH: 8 },
+                      ].map((bar) => {
+                        const isActive = activeCustomerBar === bar.label
+                        return (
+                          <div
+                            key={bar.label}
+                            className="flex-1 flex flex-col items-center group cursor-pointer"
+                            onMouseEnter={() => setActiveCustomerBar(bar.label)}
+                          >
+                            {/* Variable-height Top Pill */}
+                            <div className="w-full relative mb-1.5 flex flex-col justify-end" style={{ height: '110px' }}>
+                              {isActive && (
+                                <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-black text-white text-[10px] font-bold px-2 py-0.5 rounded-[4px] whitespace-nowrap shadow-sm animate-fadeIn">
+                                  {bar.value}
+                                </div>
                               )}
+                              <div
+                                className={`w-full rounded-2xl relative transition-all duration-300 ${isActive ? 'bg-[#f97316] shadow-sm' : 'bg-[#eef2f6] hover:bg-[#e2e8f0]'
+                                  }`}
+                                style={{ height: `${bar.topH}px` }}
+                              >
+                                {/* Centered white dot near top of non-active pills */}
+                                {!isActive && (
+                                  <span className="absolute top-2.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-white rounded-full opacity-90 shadow-sm" />
+                                )}
+                              </div>
                             </div>
-                          </div>
 
-                          {/* Constant-height Bottom Striped Box */}
-                          <div className="w-full h-11 rounded-[14px] border border-slate-150 relative overflow-hidden bg-slate-50">
-                            <svg className="absolute inset-0 w-full h-full opacity-[0.25]" xmlns="http://www.w3.org/2000/svg">
-                              <defs>
-                                <pattern id={`stripe-pattern-${bar.day}`} patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
-                                  <line x1="0" y1="0" x2="0" y2="8" stroke="#4a5568" strokeWidth="2.2" />
-                                </pattern>
-                              </defs>
-                              <rect width="100%" height="100%" fill={`url(#stripe-pattern-${bar.day})`} />
-                            </svg>
-                          </div>
+                            {/* Constant-height Bottom Striped Box */}
+                            <div className={`w-full h-11 rounded-[14px] border ${isActive ? 'border-[#f97316]/30' : 'border-slate-150'} relative overflow-hidden bg-slate-50 transition-all`}>
+                              <svg className="absolute inset-0 w-full h-full opacity-[0.25]" xmlns="http://www.w3.org/2000/svg">
+                                <defs>
+                                  <pattern id={`stripe-pattern-${bar.label.replace(/[^a-zA-Z0-9]/g, '-')}`} patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+                                    <line x1="0" y1="0" x2="0" y2="8" stroke={isActive ? "#f97316" : "#4a5568"} strokeWidth="2.2" />
+                                  </pattern>
+                                </defs>
+                                <rect width="100%" height="100%" fill={`url(#stripe-pattern-${bar.label.replace(/[^a-zA-Z0-9]/g, '-')})`} />
+                              </svg>
+                            </div>
 
-                          <span className="text-[10px] font-bold text-slate-400 mt-2.5">{bar.day}</span>
-                        </div>
-                      ))}
+                            <span className={`text-[9px] font-bold mt-2.5 text-center leading-tight block select-none transition-colors ${isActive ? 'text-slate-900 font-extrabold' : 'text-slate-400'}`}>
+                              {bar.label}
+                            </span>
+                          </div>
+                        )
+                      })}
                     </div>
                   </div>
                 </div>
@@ -807,149 +1051,324 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
                 {/* ═══════════════════════════════════════════════ */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-                  {/* ── Transaction History (Recent Orders) ── */}
-                  <div className="lg:col-span-7 bg-white rounded-[28px] p-7 shadow-sm border border-slate-100 text-left">
-                    <div className="flex justify-between items-start mb-1">
+                  {/* ── Transaction Activity Chart ── */}
+                  <div className="lg:col-span-7 bg-white rounded-[28px] p-7 shadow-sm border border-slate-100 text-left relative flex flex-col justify-between min-h-[380px]">
+
+                    {/* Header */}
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                       <div>
-                        <h2 className="text-[17px] font-bold text-slate-800">Transaction History</h2>
+                        <h2 className="text-[17px] font-bold text-slate-800 flex items-center gap-2">
+                          <span>Transaction Activity</span>
+                          <span className="bg-blue-50 text-[#2563eb] text-[10px] font-bold px-2 py-0.5 rounded-md flex items-center gap-1">
+                            <span className="w-1 h-1 rounded-full bg-[#2563eb] animate-ping" /> Live
+                          </span>
+                        </h2>
                         <p className="text-[12px] text-slate-400 font-medium mt-0.5">
-                          {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} — Recent Orders
+                          Order volume and processing trends
                         </p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => handleNav('orders')} className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-700 cursor-pointer transition-colors">
-                          <Search className="w-3.5 h-3.5" />
-                        </button>
-                        <button onClick={() => triggerToast('Filtering transactions...')} className="w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-700 cursor-pointer transition-colors">
-                          <SlidersHorizontal className="w-3.5 h-3.5" />
-                        </button>
+
+                      {/* Controls */}
+                      <div className="flex items-center flex-wrap gap-2.5 self-stretch sm:self-auto justify-between">
+                        {/* Metric toggle */}
+                        <div className="flex bg-slate-100 rounded-full p-0.5 border border-slate-200/50">
+                          <button
+                            onClick={() => setChartMetric('orders')}
+                            className={`px-3 py-1.5 rounded-full text-[10.5px] font-bold transition-all cursor-pointer ${chartMetric === 'orders'
+                                ? 'bg-white text-slate-800 shadow-xs'
+                                : 'text-slate-500 hover:text-slate-800'
+                              }`}
+                          >
+                            Orders
+                          </button>
+                          <button
+                            onClick={() => setChartMetric('revenue')}
+                            className={`px-3 py-1.5 rounded-full text-[10.5px] font-bold transition-all cursor-pointer ${chartMetric === 'revenue'
+                                ? 'bg-white text-slate-800 shadow-xs'
+                                : 'text-slate-500 hover:text-slate-800'
+                              }`}
+                          >
+                            Revenue
+                          </button>
+                        </div>
+
+                        {/* Timeframe selector */}
+                        <div className="flex gap-1">
+                          {(['week', 'month', 'year'] as const).map((range) => {
+                            const isActive = chartTimeRange === range
+                            const labels = { week: 'Week', month: 'Month', year: 'Year' }
+                            return (
+                              <button
+                                key={range}
+                                onClick={() => setChartTimeRange(range)}
+                                className={`px-2.5 py-1.5 rounded-full text-[10.5px] font-bold transition-all cursor-pointer ${isActive
+                                    ? 'bg-slate-950 text-white shadow-xs'
+                                    : 'bg-white text-slate-500 border border-slate-200 hover:text-slate-800 hover:border-slate-350 shadow-2xs'
+                                  }`}
+                              >
+                                {labels[range]}
+                              </button>
+                            )
+                          })}
+                        </div>
                       </div>
                     </div>
 
-                    {/* Transaction rows */}
-                    <div className="mt-5 flex flex-col gap-0 divide-y divide-slate-100">
-                      {orders.slice(0, 4).map((order, idx) => {
-                        const logos: Record<string, { bg: string; letter: string; color: string }> = {
-                          'Microsoft': { bg: 'bg-red-50', letter: 'M', color: 'text-red-500' },
-                          'Google': { bg: 'bg-blue-50', letter: 'G', color: 'text-blue-500' },
-                          'Zoho': { bg: 'bg-emerald-50', letter: 'Z', color: 'text-emerald-600' },
-                        }
-                        const vendor = order.product.includes('Microsoft') ? 'Microsoft'
-                          : order.product.includes('Google') ? 'Google'
-                            : 'Zoho'
-                        const logo = logos[vendor] || logos['Microsoft']
-                        const isActive = order.status === 'Active'
+                    {/* Stats summary row */}
+                    <div className="grid grid-cols-3 gap-2 py-3 border-b border-slate-100 mb-3 mt-4">
+                      <div className="flex flex-col text-left">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Processed Vol</span>
+                        <span className="text-[18px] font-extrabold text-slate-800 mt-0.5">{totalActiveOrders.toLocaleString()} Orders</span>
+                        <span className="text-[9.5px] font-bold text-emerald-600 flex items-center gap-0.5 mt-0.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                          {currentTrend.volTrend}
+                        </span>
+                      </div>
+                      <div className="flex flex-col text-left border-l border-slate-100 pl-4">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Billing Amt</span>
+                        <span className="text-[18px] font-extrabold text-slate-800 mt-0.5">
+                          {new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(totalActiveRevenue)}
+                        </span>
+                        <span className="text-[9.5px] font-bold text-emerald-600 flex items-center gap-0.5 mt-0.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                          {currentTrend.amtTrend}
+                        </span>
+                      </div>
+                      <div className="flex flex-col text-left border-l border-slate-100 pl-4">
+                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Success Rate</span>
+                        <span className="text-[18px] font-extrabold text-slate-800 mt-0.5">{currentTrend.successRate}</span>
+                        <span className="text-[9.5px] font-bold text-emerald-600 flex items-center gap-0.5 mt-0.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                          {currentTrend.successDetail}
+                        </span>
+                      </div>
+                    </div>
 
-                        return (
-                          <div key={order.id} className="flex items-center gap-4 py-4 first:pt-0">
-                            {/* Vendor Logo */}
-                            <div className={`w-10 h-10 rounded-xl ${logo.bg} flex items-center justify-center font-bold text-base ${logo.color} shrink-0 border border-slate-100`}>
-                              {logo.letter === 'M' ? (
-                                <svg className="w-4 h-4" viewBox="0 0 23 23" fill="none">
-                                  <rect x="0" y="0" width="10.5" height="10.5" fill="#f25022" />
-                                  <rect x="12.5" y="0" width="10.5" height="10.5" fill="#7fba00" />
-                                  <rect x="0" y="12.5" width="10.5" height="10.5" fill="#00a4ef" />
-                                  <rect x="12.5" y="12.5" width="10.5" height="10.5" fill="#ffb900" />
-                                </svg>
-                              ) : (
-                                <span className="text-sm font-extrabold">{logo.letter}</span>
-                              )}
-                            </div>
+                    {/* Chart area */}
+                    <div className="relative flex-1 min-h-[190px] w-full select-none">
+                      <svg className="w-full h-full overflow-visible" viewBox="0 0 500 200" preserveAspectRatio="none">
+                        <defs>
+                          <linearGradient id="chart-fill-grad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#4f46e5" stopOpacity="0.25" />
+                            <stop offset="100%" stopColor="#4f46e5" stopOpacity="0.0" />
+                          </linearGradient>
+                          <linearGradient id="chart-stroke-grad" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stopColor="#4f46e5" />
+                            <stop offset="50%" stopColor="#6366f1" />
+                            <stop offset="100%" stopColor="#818cf8" />
+                          </linearGradient>
+                        </defs>
 
-                            {/* Product name */}
-                            <div className="flex-1 min-w-0">
-                              <span className="text-[13px] font-semibold text-slate-800 block truncate">{order.product.split(' - ')[0]}</span>
-                            </div>
+                        {/* Horizontal grid lines */}
+                        {[0, 0.25, 0.5, 0.75, 1].map((pct, idx) => {
+                          const yVal = 160 - pct * 140
+                          const labelVal = maxChartVal * pct
+                          return (
+                            <g key={idx} className="opacity-30">
+                              <line
+                                x1="35"
+                                y1={yVal}
+                                x2="475"
+                                y2={yVal}
+                                stroke="#cbd5e1"
+                                strokeWidth="1"
+                                strokeDasharray="4 4"
+                              />
+                              <text
+                                x="28"
+                                y={yVal + 3.5}
+                                textAnchor="end"
+                                className="text-[9px] font-semibold fill-slate-400 font-mono"
+                              >
+                                {formatChartYLabel(labelVal)}
+                              </text>
+                            </g>
+                          )
+                        })}
 
-                            {/* Date */}
-                            <span className="text-[12px] text-slate-400 font-medium hidden sm:block whitespace-nowrap">
-                              {order.date}
+                        {/* Area under the line */}
+                        {chartAreaPath && (
+                          <path
+                            d={chartAreaPath}
+                            fill="url(#chart-fill-grad)"
+                            className="transition-all duration-500 ease-in-out"
+                          />
+                        )}
+
+                        {/* Line itself */}
+                        {chartLinePath && (
+                          <path
+                            d={chartLinePath}
+                            fill="none"
+                            stroke="url(#chart-stroke-grad)"
+                            strokeWidth="3.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="transition-all duration-500 ease-in-out"
+                          />
+                        )}
+
+                        {/* Data dots (always rendered but small, styled nicely) */}
+                        {chartPoints.map((p, idx) => {
+                          const isHovered = hoveredChartIndex === idx
+                          return (
+                            <g key={idx}>
+                              <circle
+                                cx={p.x}
+                                cy={p.y}
+                                r={isHovered ? "5" : "3.5"}
+                                fill={isHovered ? "#ffffff" : "#6366f1"}
+                                stroke="#6366f1"
+                                strokeWidth={isHovered ? "3" : "1.5"}
+                                className="transition-all duration-200"
+                              />
+                            </g>
+                          )
+                        })}
+
+                        {/* X-axis text labels */}
+                        {chartPoints.map((p, idx) => (
+                          <text
+                            key={idx}
+                            x={p.x}
+                            y="182"
+                            textAnchor="middle"
+                            className={`text-[9.5px] font-bold select-none transition-colors ${hoveredChartIndex === idx ? 'fill-slate-900 font-black' : 'fill-slate-400'
+                              }`}
+                          >
+                            {p.label}
+                          </text>
+                        ))}
+
+                        {/* Vertical line indicator and glowing dot overlay on hover */}
+
+
+                        {/* Invisible interactive rectangular hover catchers */}
+                        {chartPoints.map((p, idx) => {
+                          const rectWidth = chartDx
+                          const rectX = p.x - rectWidth / 2
+                          return (
+                            <rect
+                              key={idx}
+                              x={rectX}
+                              y="15"
+                              width={rectWidth}
+                              height="155"
+                              fill="transparent"
+                              className="cursor-pointer"
+                              onMouseEnter={() => setHoveredChartIndex(idx)}
+                              onMouseLeave={() => setHoveredChartIndex(null)}
+                            />
+                          )
+                        })}
+                      </svg>
+
+                      {/* Tooltip Popup */}
+                      {hoveredChartIndex !== null && chartPoints[hoveredChartIndex] && (
+                        <div
+                          className="absolute bg-slate-950/95 backdrop-blur-md border border-slate-800 text-white rounded-xl p-3 shadow-xl pointer-events-none z-30 select-none animate-fadeIn flex flex-col gap-0.5 transition-all duration-75"
+                          style={{
+                            left: `${(chartPoints[hoveredChartIndex].x / 500) * 100}%`,
+                            top: `${(chartPoints[hoveredChartIndex].y / 200) * 100}%`,
+                            transform: 'translate(-50%, -125%)',
+                          }}
+                        >
+                          <span className="text-[10px] font-bold text-slate-400 font-sans tracking-wide uppercase">
+                            {chartPoints[hoveredChartIndex].date}
+                          </span>
+                          <div className="flex items-center gap-1.5 mt-0.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[#6366f1]" />
+                            <span className="text-[12.5px] font-extrabold font-sans">
+                              {chartMetric === 'orders'
+                                ? `${chartPoints[hoveredChartIndex].value} Orders`
+                                : `$${chartPoints[hoveredChartIndex].value.toLocaleString('en-US')}`
+                              }
                             </span>
-
-                            {/* Status badge */}
-                            <span className={`flex items-center gap-1.5 text-[11px] font-semibold px-3 py-1 rounded-full whitespace-nowrap ${isActive ? 'bg-amber-50 text-amber-600' : 'bg-emerald-50 text-emerald-600'
-                              }`}>
-                              <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-amber-500' : 'bg-emerald-500'}`} />
-                              {isActive ? 'In process' : 'Completed'}
-                            </span>
-
-                            {/* Category */}
-                            <span className="text-[12px] text-slate-400 font-medium hidden md:block">Subscription</span>
-
-                            {/* Amount */}
-                            <span className="text-[13px] font-semibold text-slate-700 whitespace-nowrap">- {order.total}</span>
-
-                            {/* More button */}
-                            <button className="text-slate-300 hover:text-slate-500 cursor-pointer transition-colors">
-                              <span className="text-lg leading-none">···</span>
-                            </button>
                           </div>
-                        )
-                      })}
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  {/* ── Spending Overview (by Vendor) ── */}
-                  <div className="lg:col-span-5 bg-white rounded-[28px] p-7 shadow-sm border border-slate-100 text-left">
-                    <div className="flex justify-between items-start mb-6">
-                      <h2 className="text-[17px] font-bold text-slate-800">Spending Overview</h2>
-                      <div className="flex items-center gap-1.5 text-[12px] text-slate-500 font-medium border border-slate-200 rounded-full px-3 py-1 cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => triggerToast('Changing period...')}>
-                        <span>This Quarter</span>
-                        <ChevronDown className="w-3 h-3" />
+                  {/* ── Products & Services (Brand Integrations) ── */}
+                  <div className="lg:col-span-5 bg-white rounded-[28px] p-7 shadow-sm border border-slate-100 text-left flex flex-col justify-between min-h-[380px]">
+                    <div className="flex justify-between items-start mb-4">
+                      <div>
+                        <h2 className="text-[17px] font-bold text-slate-800">Products & Services</h2>
+                        <p className="text-[12px] text-slate-400 font-medium mt-0.5">
+                          Quick access to provision license subscriptions
+                        </p>
                       </div>
+                      <button
+                        onClick={() => handleNav('vendors')}
+                        className="text-[12.5px] font-bold text-slate-400 hover:text-[#2563eb] transition-colors cursor-pointer flex items-center gap-0.5 shrink-0"
+                      >
+                        <span>All Products</span>
+                        <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
                     </div>
 
-                    {/* Vertical bar chart with dashed line and tooltip annotations */}
-                    <div className="relative h-48 mt-7 flex items-end gap-4.5">
-                      {/* Dashed crossline */}
-                      <div className="absolute bottom-[92px] left-0 right-0 border-t border-dashed border-slate-350 z-10 pointer-events-none" />
-
-                      {/* Tooltip badge */}
-                      <div className="absolute bottom-[78px] right-0 bg-slate-950 text-white text-[11px] font-semibold py-1.5 px-3.5 rounded-lg z-20 shadow-sm flex items-center gap-1 select-none">
-                        Health & wellness
-                      </div>
-
-                      {/* Bar 1: Microsoft (67%) */}
-                      <div className="flex-1 flex flex-col justify-end h-full">
-                        <div className="w-full h-[140px] rounded-2xl overflow-hidden relative flex flex-col justify-between bg-[#2563eb] shadow-sm">
-                          {/* Solid Blue Top */}
-                          <div className="h-[48px] flex items-center justify-center">
-                            <span className="text-white text-[12px] font-extrabold">67%</span>
+                    <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-3 mt-2 flex-1 items-stretch">
+                      {[
+                        {
+                          id: 'Microsoft',
+                          name: 'Microsoft',
+                          logo: renderVendorLogo('microsoft', 'w-5.5 h-5.5')
+                        },
+                        {
+                          id: 'Google',
+                          name: 'Google',
+                          logo: renderVendorLogo('google', 'w-5.5 h-5.5')
+                        },
+                        {
+                          id: 'Zoho',
+                          name: 'Zoho',
+                          logo: renderVendorLogo('zoho')
+                        },
+                        {
+                          id: 'AWS',
+                          name: 'AWS',
+                          logo: renderVendorLogo('aws')
+                        },
+                        {
+                          id: 'Red Hat',
+                          name: 'Red Hat',
+                          logo: renderVendorLogo('redhat')
+                        },
+                        {
+                          id: 'Sophos',
+                          name: 'Sophos',
+                          logo: renderVendorLogo('sophos')
+                        },
+                        {
+                          id: 'Acronis',
+                          name: 'Acronis',
+                          logo: renderVendorLogo('acronis')
+                        },
+                        {
+                          id: 'Dropbox',
+                          name: 'Dropbox',
+                          logo: renderVendorLogo('dropbox')
+                        }
+                      ].map((brand) => (
+                        <div
+                          key={brand.id}
+                          onClick={() => {
+                            setShowcaseGroupFilter(brand.id)
+                            setAppliedShowcaseFilters(prev => ({ ...prev, group: brand.id }))
+                            handleNav('vendors')
+                            triggerToast(`Browsing ${brand.id} products...`)
+                          }}
+                          className="flex items-center justify-center p-3.5 bg-white border border-slate-100 rounded-xl hover:-translate-y-0.5 hover:shadow-md hover:border-slate-200 active:scale-98 transition-all duration-200 cursor-pointer select-none"
+                        >
+                          <div className="flex flex-col items-center gap-2">
+                            {brand.logo}
+                            <span className="text-[11px] font-bold text-slate-600 tracking-tight leading-none">
+                              {brand.name}
+                            </span>
                           </div>
-                          {/* Striped Blue Bottom */}
-                          <div className="h-[92px] w-full bg-[#1e52d9] relative border-t border-blue-400/20 overflow-hidden">
-                            <svg className="absolute inset-0 w-full h-full opacity-[0.35]" xmlns="http://www.w3.org/2000/svg">
-                              <defs>
-                                <pattern id="blue-bar-stripe" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
-                                  <line x1="0" y1="0" x2="0" y2="8" stroke="#ffffff" strokeWidth="2.2" />
-                                </pattern>
-                              </defs>
-                              <rect width="100%" height="100%" fill="url(#blue-bar-stripe)" />
-                            </svg>
-                          </div>
                         </div>
-                      </div>
-
-                      {/* Bar 2: Google (53%) */}
-                      <div className="flex-1 flex flex-col justify-end h-full">
-                        <div className="w-full h-[110px] bg-[#eef2f6] rounded-2xl flex items-start justify-center pt-3 shadow-inner">
-                          <span className="text-slate-800 text-[12px] font-extrabold">53%</span>
-                        </div>
-                      </div>
-
-                      {/* Bar 3: Zoho (45%) */}
-                      <div className="flex-1 flex flex-col justify-end h-full">
-                        <div className="w-full h-[92px] bg-[#eef2f6] rounded-2xl flex items-start justify-center pt-3 shadow-inner">
-                          <span className="text-slate-800 text-[12px] font-extrabold">45%</span>
-                        </div>
-                      </div>
-
-                      {/* Bar 4: Others (38%) */}
-                      <div className="flex-1 flex flex-col justify-end h-full">
-                        <div className="w-full h-[76px] bg-[#eef2f6] rounded-2xl flex items-start justify-center pt-3 shadow-inner">
-                          <span className="text-slate-800 text-[12px] font-extrabold">38%</span>
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
                 </div>
@@ -1034,7 +1453,11 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
                     { id: 'Microsoft', label: 'Microsoft' },
                     { id: 'Google', label: 'Google' },
                     { id: 'Zoho', label: 'Zoho' },
-                    { id: 'Sophos', label: 'Sophos' }
+                    { id: 'AWS', label: 'AWS' },
+                    { id: 'Red Hat', label: 'Red Hat' },
+                    { id: 'Sophos', label: 'Sophos' },
+                    { id: 'Acronis', label: 'Acronis' },
+                    { id: 'Dropbox', label: 'Dropbox' }
                   ].map((btn) => {
                     const isActive = showcaseGroupFilter === btn.id
                     return (
@@ -1096,8 +1519,8 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
                                 setRegionDropdownOpen(false)
                               }}
                               className={`w-full text-left px-4 py-2.5 text-xs font-medium transition-colors cursor-pointer ${showcaseRegionFilter === opt
-                                  ? 'bg-slate-950 text-white'
-                                  : 'text-slate-700 hover:bg-slate-50'
+                                ? 'bg-slate-950 text-white'
+                                : 'text-slate-700 hover:bg-slate-50'
                                 }`}
                             >
                               {opt}
@@ -1121,50 +1544,18 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
                   {filteredShowcaseProducts.map((p, idx) => {
                     // Custom SVG Logos for High Fidelity Design
                     let logoElem;
-                    if (p.logo === 'microsoft') {
+                    const vendorLogoKeys = ['microsoft', 'google', 'zoho', 'aws', 'redhat', 'sophos', 'acronis', 'dropbox'];
+                    if (vendorLogoKeys.includes(p.logo.toLowerCase())) {
                       logoElem = (
                         <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shadow-inner p-2 select-none shrink-0">
-                          <svg className="w-5.5 h-5.5" viewBox="0 0 23 23" fill="none">
-                            <rect x="0" y="0" width="10.5" height="10.5" fill="#f25022" />
-                            <rect x="11.5" y="0" width="10.5" height="10.5" fill="#7fba00" />
-                            <rect x="0" y="11.5" width="10.5" height="10.5" fill="#00a4ef" />
-                            <rect x="11.5" y="11.5" width="10.5" height="10.5" fill="#ffb900" />
-                          </svg>
-                        </div>
-                      )
-                    } else if (p.logo === 'google') {
-                      logoElem = (
-                        <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shadow-inner p-2 select-none shrink-0">
-                          <svg className="w-5.5 h-5.5" viewBox="0 0 24 24" fill="none">
-                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
-                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
-                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l3.66-2.85z" fill="#FBBC05" />
-                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.85c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
-                          </svg>
-                        </div>
-                      )
-                    } else if (p.logo === 'zoho') {
-                      logoElem = (
-                        <div className="w-10 h-10 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center shadow-inner p-2 select-none shrink-0">
-                          {/* Zoho 4 interconnected rings style */}
-                          <div className="grid grid-cols-2 gap-1 w-5.5 h-5.5">
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#1565c0]" />
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#e53935]" />
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#43a047]" />
-                            <div className="w-2.5 h-2.5 rounded-full bg-[#fdd835]" />
-                          </div>
+                          {renderVendorLogo(p.logo)}
                         </div>
                       )
                     } else {
                       // Fallback stylized text circle
                       const initials = p.name.includes('Exchange') ? 'EX' : p.logo.substring(0, 2).toUpperCase()
-                      const groupColors =
-                        p.logo === 'sophos' ? 'bg-[#002f6c] text-white border border-[#002f6c]' :
-                          p.logo === 'acronis' ? 'bg-[#009bf5] text-white border border-[#009bf5]' :
-                            p.logo === 'aws' ? 'bg-amber-600 text-white border border-amber-600' :
-                              'bg-slate-800 text-white'
                       logoElem = (
-                        <div className={`w-10 h-10 rounded-xl ${groupColors} flex items-center justify-center font-extrabold text-xs tracking-wider shadow-sm select-none shrink-0`}>
+                        <div className="w-10 h-10 rounded-xl bg-slate-850 text-white flex items-center justify-center font-extrabold text-xs tracking-wider shadow-sm select-none shrink-0">
                           {initials}
                         </div>
                       )
@@ -1177,6 +1568,9 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
                     else if (p.logo === 'zoho') catLabel = 'ZOHO MAIL';
                     else if (p.logo === 'sophos') catLabel = 'SECURITY';
                     else if (p.logo === 'acronis') catLabel = 'BACKUP';
+                    else if (p.logo === 'redhat') catLabel = 'RED HAT';
+                    else if (p.logo === 'aws') catLabel = 'AWS CLOUD';
+                    else if (p.logo === 'dropbox') catLabel = 'DROPBOX';
 
                     return (
                       <div key={idx} className="bg-white rounded-[28px] p-7 border border-slate-100 shadow-sm hover:shadow-md transition-all flex flex-col justify-between min-h-[350px] text-left">
@@ -1554,201 +1948,213 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
 
             {/* Tab 6: Profile */}
             {activeTab === 'profile' && (
-              <div className="space-y-6 animate-fadeIn text-left">
-                {/* Title Bar */}
-                <div className="space-y-1">
-                  <h1 className="text-xl font-black text-slate-850 uppercase tracking-tight">My Profile</h1>
-                  <p className="text-xs text-slate-500 font-medium">Update account general details, billing address details, and security parameters</p>
+              <div className="space-y-8 animate-fadeIn text-left max-w-6xl mx-auto pb-10">
+                {/* Title and Hero Header Banner */}
+                <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-white p-6 md:p-8 shadow-sm">
+                  {/* Background accent lines */}
+                  <div className="absolute right-0 top-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-[#f41b5d]/5 blur-3xl pointer-events-none" />
+                  <div className="absolute left-1/3 bottom-0 -ml-16 -mb-16 w-48 h-48 rounded-full bg-blue-500/5 blur-3xl pointer-events-none" />
+
+                  <div className="flex flex-col md:flex-row items-center md:items-start gap-6 relative z-10">
+                    {/* Large Avatar container with badge */}
+                    <div className="relative shrink-0 group">
+                      <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white shadow-md ring-1 ring-slate-100 relative">
+                        <Image
+                          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&h=150&q=80"
+                          alt="User Profile"
+                          width={96}
+                          height={96}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      </div>
+                      <span className="absolute bottom-0 right-1 w-5 h-5 bg-emerald-500 border-2 border-white rounded-full flex items-center justify-center shadow-sm">
+                        <span className="w-2.5 h-2.5 bg-white rounded-full animate-ping absolute" />
+                        <span className="w-1.5 h-1.5 bg-white rounded-full" />
+                      </span>
+                    </div>
+
+                    {/* Profile Meta info */}
+                    <div className="flex-1 text-center md:text-left space-y-2.5 pt-2">
+                      <div className="space-y-1">
+                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
+                          <h2 className="text-xl font-black text-slate-800 tracking-tight capitalize">{profile.givenName} {profile.familyName}</h2>
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-slate-900 text-white select-none">
+                            Admin
+                          </span>
+                        </div>
+                        <p className="text-xs text-slate-400 font-bold tracking-wide flex items-center justify-center md:justify-start gap-1">
+                          <Building className="w-3.5 h-3.5 text-slate-400" />
+                          {profile.organization}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-1.5 text-[11px] font-semibold text-slate-500">
+                        <span className="flex items-center gap-1">
+                          <Mail className="w-3.5 h-3.5 text-slate-400" />
+                          {profile.email}
+                        </span>
+                        <span className="hidden md:inline text-slate-300">•</span>
+                        <span className="flex items-center gap-1">
+                          <Phone className="w-3.5 h-3.5 text-slate-400" />
+                          {profile.phone}
+                        </span>
+                        <span className="hidden md:inline text-slate-300">•</span>
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                          {profile.city}, {profile.country}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Profile Settings Box */}
-                <div className="bg-white rounded-2xl border border-slate-200/80 p-8 shadow-sm">
-                  <form onSubmit={handleProfileSave} className="space-y-8">
-                    {/* Form Columns Split by Line */}
-                    <div className="grid gap-8 md:grid-cols-11 items-start">
-                      {/* Left Column - General & Contact */}
-                      <div className="md:col-span-5 space-y-5">
-                        <h3 className="text-sm font-black tracking-wider uppercase text-slate-400 border-b border-slate-100 pb-2">General Details</h3>
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-1.5 text-left">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wide">Given Name</label>
-                            <div className="relative">
-                              <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                              <input
-                                type="text"
-                                value={profile.givenName}
-                                onChange={(e) => setProfile(prev => ({ ...prev, givenName: e.target.value }))}
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-3.5 text-xs font-semibold text-slate-800 outline-none focus:border-[#f41b5d]/50 focus:ring-1 focus:ring-[#f41b5d]/10 transition-all"
-                                required
-                              />
-                            </div>
-                          </div>
-
-                          <div className="space-y-1.5 text-left">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wide">Family Name</label>
-                            <input
-                              type="text"
-                              value={profile.familyName}
-                              onChange={(e) => setProfile(prev => ({ ...prev, familyName: e.target.value }))}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3.5 text-xs font-semibold text-slate-805 outline-none focus:border-[#f41b5d]/50 focus:ring-1 focus:ring-[#f41b5d]/10 transition-all"
-                              required
-                            />
-                          </div>
+                {/* Profile Grid Columns */}
+                <form onSubmit={handleProfileSave} className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+                  
+                  {/* Left Column: Name Details, Address Info & Security */}
+                  <div className="flex flex-col gap-6">
+                    
+                    {/* CARD 1: NAME DETAILS */}
+                    <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6">
+                      <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+                        <div className="w-6 h-6 rounded-lg bg-slate-50 flex items-center justify-center text-slate-600 border border-slate-100 shrink-0">
+                          <User className="w-3.5 h-3.5 text-slate-500" />
                         </div>
-
-                        <div className="space-y-1.5 text-left">
-                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-wide">Email Address</label>
-                          <div className="relative">
-                            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                            <input
-                              type="email"
-                              value={profile.email}
-                              onChange={(e) => setProfile(prev => ({ ...prev, email: e.target.value }))}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-3.5 text-xs font-semibold text-slate-850 outline-none focus:border-[#f41b5d]/50 focus:ring-1 focus:ring-[#f41b5d]/10 transition-all"
-                              required
-                            />
-                          </div>
-                        </div>
-
-                        <div className="space-y-1.5 text-left">
-                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-wide">Phone Number</label>
-                          <div className="relative">
-                            <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                            <input
-                              type="text"
-                              value={profile.phone}
-                              onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-3.5 text-xs font-semibold text-slate-850 outline-none focus:border-[#f41b5d]/50 focus:ring-1 focus:ring-[#f41b5d]/10 transition-all"
-                              required
-                            />
-                          </div>
+                        <div>
+                          <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-wider">Name Details</h4>
+                          <p className="text-[9px] text-slate-400 font-bold tracking-wide">Configure your personal and corporate identity details</p>
                         </div>
                       </div>
 
-                      {/* Vertical Divider */}
-                      <div className="hidden md:flex justify-center md:col-span-1 h-64 self-center">
-                        <div className="w-[1px] h-full bg-slate-200" />
-                      </div>
-
-                      {/* Right Column - Address & Company */}
-                      <div className="md:col-span-5 space-y-5">
-                        <h3 className="text-sm font-black tracking-wider uppercase text-slate-400 border-b border-slate-100 pb-2">Business & Address Info</h3>
-
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1.5 text-left">
-                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-wide">Organization Name</label>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Given Name</label>
                           <div className="relative">
-                            <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                            <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
                             <input
                               type="text"
-                              value={profile.organization}
-                              onChange={(e) => setProfile(prev => ({ ...prev, organization: e.target.value }))}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-3.5 text-xs font-semibold text-slate-850 outline-none focus:border-[#f41b5d]/50 focus:ring-1 focus:ring-[#f41b5d]/10 transition-all"
+                              value={profile.givenName}
+                              onChange={(e) => setProfile(prev => ({ ...prev, givenName: e.target.value }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 pl-11 pr-4 text-xs font-semibold text-slate-800 outline-none focus:border-[#f41b5d] focus:ring-4 focus:ring-[#f41b5d]/5 focus:bg-white transition-all duration-200"
                               required
                             />
                           </div>
                         </div>
 
                         <div className="space-y-1.5 text-left">
-                          <label className="text-[10px] font-black text-slate-500 uppercase tracking-wide">Street Address</label>
-                          <div className="relative">
-                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                            <input
-                              type="text"
-                              value={profile.street}
-                              onChange={(e) => setProfile(prev => ({ ...prev, street: e.target.value }))}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-3.5 text-xs font-semibold text-slate-850 outline-none focus:border-[#f41b5d]/50 focus:ring-1 focus:ring-[#f41b5d]/10 transition-all"
-                              required
-                            />
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-3">
-                          <div className="space-y-1.5 text-left col-span-1">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wide">City</label>
-                            <input
-                              type="text"
-                              value={profile.city}
-                              onChange={(e) => setProfile(prev => ({ ...prev, city: e.target.value }))}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3.5 text-xs font-semibold text-slate-850 outline-none focus:border-[#f41b5d]/50 focus:ring-1 focus:ring-[#f41b5d]/10 transition-all"
-                              required
-                            />
-                          </div>
-
-                          <div className="space-y-1.5 text-left col-span-1">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wide">Country</label>
-                            <input
-                              type="text"
-                              value={profile.country}
-                              onChange={(e) => setProfile(prev => ({ ...prev, country: e.target.value }))}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3.5 text-xs font-semibold text-slate-850 outline-none focus:border-[#f41b5d]/50 focus:ring-1 focus:ring-[#f41b5d]/10 transition-all"
-                              required
-                            />
-                          </div>
-
-                          <div className="space-y-1.5 text-left col-span-1">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wide">Postal Code</label>
-                            <input
-                              type="text"
-                              value={profile.postalCode}
-                              onChange={(e) => setProfile(prev => ({ ...prev, postalCode: e.target.value }))}
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3.5 text-xs font-semibold text-slate-850 outline-none focus:border-[#f41b5d]/50 focus:ring-1 focus:ring-[#f41b5d]/10 transition-all"
-                              required
-                            />
-                          </div>
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Family Name</label>
+                          <input
+                            type="text"
+                            value={profile.familyName}
+                            onChange={(e) => setProfile(prev => ({ ...prev, familyName: e.target.value }))}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-xs font-semibold text-slate-800 outline-none focus:border-[#f41b5d] focus:ring-4 focus:ring-[#f41b5d]/5 focus:bg-white transition-all duration-200"
+                            required
+                          />
                         </div>
                       </div>
                     </div>
 
-                    <div className="h-[1px] bg-slate-100 my-6" />
-
-                    {/* Password change security section */}
-                    <div className="grid gap-6 md:grid-cols-2">
-                      <div className="space-y-4 text-left">
-                        <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-wider">Change Password</h4>
-                        <div className="space-y-3">
-                          <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wide">New Password</label>
-                            <div className="relative">
-                              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                              <input
-                                type="password"
-                                placeholder="••••••••"
-                                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-3.5 text-xs font-semibold text-slate-850 outline-none focus:border-[#f41b5d]/50 focus:ring-1 focus:ring-[#f41b5d]/10 transition-all"
-                              />
-                            </div>
-                          </div>
-                          <div className="space-y-1.5">
-                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-wide">Confirm New Password</label>
-                            <input
-                              type="password"
-                              placeholder="••••••••"
-                              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 px-3.5 text-xs font-semibold text-slate-850 outline-none focus:border-[#f41b5d]/50 focus:ring-1 focus:ring-[#f41b5d]/10 transition-all"
-                            />
-                          </div>
+                    {/* CARD 2: ADDRESS INFO */}
+                    <div className="flex-1 bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm flex flex-col gap-6">
+                      <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+                        <div className="w-6 h-6 rounded-lg bg-slate-50 flex items-center justify-center text-slate-600 border border-slate-100 shrink-0">
+                          <MapPin className="w-3.5 h-3.5 text-slate-500" />
+                        </div>
+                        <div>
+                          <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-wider">Address Info</h4>
+                          <p className="text-[9px] text-slate-400 font-bold tracking-wide">Manage your reseller organization physical address settings</p>
                         </div>
                       </div>
 
-                      <div className="space-y-4 text-left flex flex-col justify-between">
-                        <div className="space-y-2">
-                          <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-wider">Security & 2-Factor Authentication</h4>
-                          <p className="text-xs text-slate-400 font-semibold leading-relaxed">
-                            Add an extra layer of protection to your SaaSOrder Reseller Administrator session by toggling the authentication shield.
-                          </p>
+                      <div className="flex-1 flex flex-col gap-4">
+                        <div className="space-y-1.5 text-left">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Street Address</label>
+                          <div className="relative">
+                            <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                            <input
+                              type="text"
+                              value={profile.street}
+                              onChange={(e) => setProfile(prev => ({ ...prev, street: e.target.value }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 pl-11 pr-4 text-xs font-semibold text-slate-800 outline-none focus:border-[#f41b5d] focus:ring-4 focus:ring-[#f41b5d]/5 focus:bg-white transition-all duration-200"
+                              required
+                            />
+                          </div>
                         </div>
 
-                        <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border border-slate-100 mt-2">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${profile.twoFA ? 'bg-emerald-50 border border-emerald-100 text-emerald-600' : 'bg-slate-200 text-slate-400'}`}>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="space-y-1.5 text-left">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Country</label>
+                            <input
+                              type="text"
+                              value={profile.country}
+                              onChange={(e) => setProfile(prev => ({ ...prev, country: e.target.value }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-xs font-semibold text-slate-800 outline-none focus:border-[#f41b5d] focus:ring-4 focus:ring-[#f41b5d]/5 focus:bg-white transition-all duration-200"
+                              required
+                            />
+                          </div>
+
+                          <div className="space-y-1.5 text-left">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">City</label>
+                            <input
+                              type="text"
+                              value={profile.city}
+                              onChange={(e) => setProfile(prev => ({ ...prev, city: e.target.value }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-xs font-semibold text-slate-800 outline-none focus:border-[#f41b5d] focus:ring-4 focus:ring-[#f41b5d]/5 focus:bg-white transition-all duration-200"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1.5 text-left">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Postal Code</label>
+                          <input
+                            type="text"
+                            value={profile.postalCode}
+                            onChange={(e) => setProfile(prev => ({ ...prev, postalCode: e.target.value }))}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 px-4 text-xs font-semibold text-slate-800 outline-none focus:border-[#f41b5d] focus:ring-4 focus:ring-[#f41b5d]/5 focus:bg-white transition-all duration-200"
+                            required
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CARD 5: SECURITY (placed here for visual balance) */}
+                    <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6">
+                      <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+                        <div className="w-6 h-6 rounded-lg bg-slate-50 flex items-center justify-center text-slate-600 border border-slate-100 shrink-0">
+                          <Lock className="w-3.5 h-3.5 text-slate-500" />
+                        </div>
+                        <div>
+                          <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-wider">Security</h4>
+                          <p className="text-[9px] text-slate-400 font-bold tracking-wide">Manage account credentials and login policies</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="space-y-1.5 text-left">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Change Password</label>
+                          <div className="relative">
+                            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                            <input
+                              type="password"
+                              placeholder="••••••••"
+                              className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 pl-11 pr-4 text-xs font-semibold text-slate-800 outline-none focus:border-[#f41b5d] focus:ring-4 focus:ring-[#f41b5d]/5 focus:bg-white transition-all duration-200"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-150/80 mt-1">
+                          <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${profile.twoFA ? 'bg-[#fdf2f4] border border-pink-100 text-[#f41b5d]' : 'bg-slate-100 border border-slate-200 text-slate-400'}`}>
                             <Shield className="w-4.5 h-4.5" />
                           </div>
-                          <div className="flex-1">
-                            <p className="text-xs font-extrabold text-slate-700">Two-Factor Authentication (2FA)</p>
-                            <p className="text-[10px] font-bold text-slate-400 mt-0.5">Secure logins with mobile code authorization</p>
+                          <div className="flex-1 text-left">
+                            <p className="text-xs font-extrabold text-slate-700">2FA Settings</p>
+                            <p className="text-[9.5px] font-bold text-slate-400 mt-0.5 leading-tight">Secure logins with mobile code authorization</p>
                           </div>
                           <button
                             type="button"
                             onClick={() => setProfile(prev => ({ ...prev, twoFA: !prev.twoFA }))}
-                            className={`w-10 h-6 rounded-full p-1 transition-all relative ${profile.twoFA ? 'bg-[#f41b5d]' : 'bg-slate-300'}`}
+                            className={`w-10 h-6 rounded-full p-1 transition-all relative cursor-pointer border-0 outline-none flex items-center ${profile.twoFA ? 'bg-[#f41b5d]' : 'bg-slate-300'}`}
                           >
                             <div className={`w-4 h-4 rounded-full bg-white shadow-sm transition-all transform ${profile.twoFA ? 'translate-x-4' : 'translate-x-0'}`} />
                           </button>
@@ -1756,17 +2162,178 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
                       </div>
                     </div>
 
-                    {/* Save Button */}
-                    <div className="flex justify-center pt-4">
-                      <button
-                        type="submit"
-                        className="w-full sm:w-64 bg-[#f41b5d] hover:bg-[#d0144d] text-white font-bold py-3 px-6 rounded-xl transition-all shadow-md shadow-[#f41b5d]/10 hover:-translate-y-0.5 active:scale-95 cursor-pointer text-sm"
-                      >
-                        Save Changes
-                      </button>
+                  </div>
+
+                  {/* Right Column: Contact Details & Business Details */}
+                  <div className="flex flex-col gap-6">
+                    
+                    {/* CARD 3: CONTACT DETAILS */}
+                    <div className="bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6">
+                      <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+                        <div className="w-6 h-6 rounded-lg bg-slate-50 flex items-center justify-center text-slate-600 border border-slate-100 shrink-0">
+                          <Mail className="w-3.5 h-3.5 text-slate-500" />
+                        </div>
+                        <div>
+                          <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-wider">Contact Details</h4>
+                          <p className="text-[9px] text-slate-400 font-bold tracking-wide">Email and mobile connectivity parameters</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div className="space-y-2 text-left">
+                          <div className="flex justify-between items-center">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Email Address</label>
+                            <button
+                              type="button"
+                              onClick={() => setIsEditingEmail(!isEditingEmail)}
+                              className="text-[10px] font-bold text-[#f41b5d] hover:text-[#d0144d] transition-colors flex items-center gap-1 cursor-pointer bg-transparent border-0"
+                            >
+                              <Edit2 className="w-3.5 h-3.5" />
+                              {isEditingEmail ? 'Done' : 'Edit'}
+                            </button>
+                          </div>
+
+                          {isEditingEmail ? (
+                            <div className="relative">
+                              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                              <input
+                                type="email"
+                                value={profile.email}
+                                onChange={(e) => setProfile(prev => ({ ...prev, email: e.target.value }))}
+                                className="w-full bg-white border border-[#f41b5d]/40 rounded-2xl py-3 pl-11 pr-4 text-xs font-semibold text-slate-800 outline-none focus:ring-4 focus:ring-[#f41b5d]/10 transition-all duration-200"
+                                required
+                                autoFocus
+                              />
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2 px-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-semibold text-slate-755">
+                              <Mail className="w-4 h-4 text-slate-400 shrink-0" />
+                              <span className="truncate">{profile.email}</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="space-y-1.5 text-left">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Phone Number</label>
+                          <div className="relative">
+                            <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                            <input
+                              type="text"
+                              value={profile.phone}
+                              onChange={(e) => setProfile(prev => ({ ...prev, phone: e.target.value }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 pl-11 pr-4 text-xs font-semibold text-slate-800 outline-none focus:border-[#f41b5d] focus:ring-4 focus:ring-[#f41b5d]/5 focus:bg-white transition-all duration-200"
+                              required
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </form>
-                </div>
+
+                    {/* CARD 4: BUSINESS DETAILS */}
+                    <div className="flex-1 bg-white rounded-3xl border border-slate-200/80 p-6 md:p-8 shadow-sm space-y-6">
+                      <div className="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+                        <div className="w-6 h-6 rounded-lg bg-slate-50 flex items-center justify-center text-slate-600 border border-slate-100 shrink-0">
+                          <Building className="w-3.5 h-3.5 text-slate-500" />
+                        </div>
+                        <div>
+                          <h4 className="text-[11px] font-black text-slate-800 uppercase tracking-wider">Business Details</h4>
+                          <p className="text-[9px] text-slate-400 font-bold tracking-wide">Reseller business and organization info</p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+
+                        {/* Partner Tier — read-only badge row */}
+                        <div className="flex items-center justify-between py-2 px-4 bg-amber-50 border border-amber-100 rounded-2xl">
+                          <div className="flex items-center gap-2">
+                            <Award className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-wider">Partner Tier</span>
+                          </div>
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-400/20 text-amber-700 border border-amber-200">
+                            {profile.partnerTier}
+                          </span>
+                        </div>
+
+                        {/* Organization Name */}
+                        <div className="space-y-1.5 text-left">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Organization Name</label>
+                          <div className="relative">
+                            <Building className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                            <input
+                              type="text"
+                              value={profile.organization}
+                              onChange={(e) => setProfile(prev => ({ ...prev, organization: e.target.value }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 pl-11 pr-4 text-xs font-semibold text-slate-800 outline-none focus:border-[#f41b5d] focus:ring-4 focus:ring-[#f41b5d]/5 focus:bg-white transition-all duration-200"
+                              required
+                            />
+                          </div>
+                        </div>
+
+                        {/* Business Type */}
+                        <div className="space-y-1.5 text-left">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Business Type</label>
+                          <div className="relative">
+                            <Percent className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                            <select
+                              value={profile.businessType}
+                              onChange={(e) => setProfile(prev => ({ ...prev, businessType: e.target.value }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 pl-11 pr-4 text-xs font-semibold text-slate-800 outline-none focus:border-[#f41b5d] focus:ring-4 focus:ring-[#f41b5d]/5 focus:bg-white transition-all duration-200 appearance-none cursor-pointer"
+                            >
+                              <option>Technology Reseller</option>
+                              <option>Managed Service Provider</option>
+                              <option>Cloud Distributor</option>
+                              <option>IT Consultant</option>
+                              <option>Value Added Reseller</option>
+                            </select>
+                            <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                          </div>
+                        </div>
+
+                        {/* Tax / GST ID */}
+                        <div className="space-y-1.5 text-left">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Tax / GST ID</label>
+                          <div className="relative">
+                            <FileText className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                            <input
+                              type="text"
+                              value={profile.taxId}
+                              onChange={(e) => setProfile(prev => ({ ...prev, taxId: e.target.value }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 pl-11 pr-4 text-xs font-semibold text-slate-800 outline-none focus:border-[#f41b5d] focus:ring-4 focus:ring-[#f41b5d]/5 focus:bg-white transition-all duration-200"
+                              placeholder="e.g. GSTIN29AABCF1234L1ZV"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Website */}
+                        <div className="space-y-1.5 text-left">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Business Website</label>
+                          <div className="relative">
+                            <ArrowUpRight className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                            <input
+                              type="url"
+                              value={profile.website}
+                              onChange={(e) => setProfile(prev => ({ ...prev, website: e.target.value }))}
+                              className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-3 pl-11 pr-4 text-xs font-semibold text-slate-800 outline-none focus:border-[#f41b5d] focus:ring-4 focus:ring-[#f41b5d]/5 focus:bg-white transition-all duration-200"
+                              placeholder="https://yourcompany.com"
+                            />
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+                  </div>
+
+                  {/* Footer submit */}
+                  <div className="lg:col-span-2 flex justify-end pt-2">
+                    <button
+                      type="submit"
+                      className="w-full sm:w-56 bg-[#f41b5d] hover:bg-[#d0144d] text-white font-bold py-3.5 px-6 rounded-2xl transition-all shadow-md shadow-[#f41b5d]/10 hover:-translate-y-0.5 active:translate-y-0 active:scale-98 cursor-pointer text-xs"
+                    >
+                      Save Changes
+                    </button>
+                  </div>
+                </form>
               </div>
             )}
 
@@ -2111,6 +2678,52 @@ export default function DashboardContainer({ initialTab = 'dashboard' }: Dashboa
                 Create Account
               </button>
             </form>
+          </div>
+        </div>
+      )}
+      {/* ======================================================== */}
+      {/* USER AGREEMENT MODAL */}
+      {/* ======================================================== */}
+      {showAgreementModal && (
+        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white w-full max-w-lg rounded-2xl border border-slate-200/60 shadow-[0_20px_50px_rgba(15,23,42,0.15)] overflow-hidden animate-scaleIn relative text-left">
+            <div className="bg-slate-50 border-b border-slate-100 p-5 flex justify-between items-center">
+              <div className="flex items-center gap-2 text-slate-800">
+                <FileText className="w-4.5 h-4.5 text-[#f41b5d]" />
+                <h3 className="text-sm font-extrabold">Reseller Program Terms & Conditions</h3>
+              </div>
+              <button onClick={() => setShowAgreementModal(false)} className="w-7 h-7 rounded-full border border-slate-200 text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center cursor-pointer">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4 max-h-[60vh] overflow-y-auto text-xs text-slate-650 leading-relaxed font-sans font-semibold">
+              <p className="text-slate-800 font-bold">Last updated: June 2026</p>
+              <p>
+                This Reseller Partnership Agreement ("Agreement") governs the relationship between Febno Technologies ("Company") and the reseller entity ("Reseller") utilizing the SaaS Order Dashboard.
+              </p>
+              <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[10px] pt-2">1. Margin & Commission Structure</h4>
+              <p>
+                Reseller is entitled to a Gold partner discount of 20% on catalog subscription listings. All orders processed through the reseller client portal are billed at reseller wholesale rates.
+              </p>
+              <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[10px] pt-2">2. API Usage & Security</h4>
+              <p>
+                Reseller API credentials must be secured. Any automated order provisioned via the API keys generated through this portal is the direct billing responsibility of the reseller tenant. Keys should be regenerated periodically.
+              </p>
+              <h4 className="font-extrabold text-slate-800 uppercase tracking-wider text-[10px] pt-2">3. Termination & Suspensions</h4>
+              <p>
+                Company reserves the right to suspend API credential access in the event of credit limits breaches or billing failures. Reseller accounts must remain in good standing to maintain active service margins.
+              </p>
+            </div>
+
+            <div className="bg-slate-50 border-t border-slate-100 p-4 flex justify-end gap-2.5">
+              <button
+                onClick={() => setShowAgreementModal(false)}
+                className="bg-slate-900 hover:bg-slate-800 text-white font-extrabold py-2 px-4 rounded-xl transition-all cursor-pointer text-xs"
+              >
+                I Understand
+              </button>
+            </div>
           </div>
         </div>
       )}
